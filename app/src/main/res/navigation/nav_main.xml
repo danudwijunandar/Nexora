@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_main"
+    app:startDestination="@id/homeFragment">
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.example.nexora1.ui.home.HomeFragment"
+        android:label="Home"
+        tools:layout="@layout/fragment_home" />
+
+    <fragment
+        android:id="@+id/activityFragment"
+        android:name="com.example.nexora1.ui.activity.ActivityFragment"
+        android:label="Activity"
+        tools:layout="@layout/fragment_activity" />
+
+    <fragment
+        android:id="@+id/financeFragment"
+        android:name="com.example.nexora1.ui.finance.FinanceFragment"
+        android:label="Finance"
+        tools:layout="@layout/fragment_finance" />
+
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.example.nexora1.ui.profile.ProfileFragment"
+        android:label="Profile"
+        tools:layout="@layout/fragment_profile" />
+
+    <fragment
+        android:id="@+id/addActivityFragment"
+        android:name="com.example.nexora1.ui.activity.AddActivityFragment"
+        android:label="Add Activity"
+        tools:layout="@layout/fragment_add_activity" />
+
+    <fragment
+        android:id="@+id/addFinanceFragment"
+        android:name="com.example.nexora1.ui.finance.AddFinanceFragment"
+        android:label="Add Finance"
+        tools:layout="@layout/fragment_add_finance" />
+
+    <fragment
+        android:id="@+id/templateActivityFragment"
+        android:name="com.example.nexora1.ui.activity.TemplateActivityFragment"
+        android:label="Template Activity"
+        tools:layout="@layout/fragment_template_activity" />
+
+    <fragment
+        android:id="@+id/updateUserFragment"
+        android:name="com.example.nexora1.ui.profile.UpdateUserFragment"
+        android:label="Update Profil"
+        tools:layout="@layout/fragment_update_user" />
+
+    <fragment
+        android:id="@+id/updatePasswordFragment"
+        android:name="com.example.nexora1.ui.profile.UpdatePasswordFragment"
+        android:label="Update Password"
+        tools:layout="@layout/fragment_update_password" />
+
+    <fragment
+        android:id="@+id/notificationFragment"
+        android:name="com.example.nexora1.ui.home.NotificationFragment"
+        android:label="Notifikasi"
+        tools:layout="@layout/fragment_notification" />
+
+</navigation>

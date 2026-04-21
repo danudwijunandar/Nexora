@@ -1,0 +1,65 @@
+<resources>
+    <string name="app_name">Nexora</string>
+    <string name="skip">Lewati</string>
+    <string name="next">Lanjut</string>
+    <string name="background_onboarding">Background Onboarding</string>
+
+    <!-- Auth -->
+    <string name="login_title">Halo, selamat \ndatang kembali</string>
+    <string name="forgot_password">Lupa password?</string>
+    <string name="btn_login">Login</string>
+    <string name="dont_have_account">Belum punya akun?</string>
+    <string name="sign_up">Daftar Sekarang</string>
+
+    <string name="register_title">Mulai perjalananmu bersama kami</string>
+    <string name="check_terms_condition">Saya setuju dengan Syarat Ketentuan Nexora</string>
+    <string name="btn_register">Register</string>
+    <string name="already_have_account">Sudah punya akun?</string>
+    <string name="sign_in">Login Sekarang</string>
+
+    <string name="hint_username">Username</string>
+    <string name="hint_email">Email</string>
+    <string name="hint_password">Password</string>
+    <string name="hint_confirm_password">Konfirmasi Password</string>
+
+    <string name="remember_me">Ingat saya</string>
+
+    <string name="home">Beranda</string>
+    <string name="activity">Aktivitas</string>
+    <string name="Profile">Profil</string>
+    <string name="greeting_user">Halo, User!</string>
+    <string name="home_subtitle">Ayo selesaikan tugasmu hari ini</string>
+    <string name="my_activity">Aktivitas Saya</string>
+    <string name="number_of_activity">0</string>
+    <string name="my_productivity">Produktivitas</string>
+    <string name="productivity_percentage">0%</string>
+    <string name="title_progress">Progress Mingguan</string>
+
+    <string name="chip_monday">Sen</string>
+    <string name="chip_tuesday">Sel</string>
+    <string name="chip_wednesday">Rab</string>
+    <string name="chip_thursday">Kam</string>
+    <string name="chip_friday">Jum</string>
+
+    <string name="title_activity">Aktivitas</string>
+    <string name="subtitle_activity">Kelola semua aktivitasmu di sini</string>
+    <string name="search_activity">Cari aktivitas...</string>
+    <string name="chip_activity_all">Semua</string>
+    <string name="chip_activity_finance">Keuangan</string>
+    <string name="chip_activity_productivity">Produktivitas</string>
+
+    <string name="title_add">Tambah Aktivitas</string>
+    <string name="title_activity_add">Judul Aktivitas</string>
+    <string name="hint_title_activity">Masukkan judul aktivitas</string>
+    <string name="description_activity">Deskripsi</string>
+    <string name="hint_description_activity">Masukkan deskripsi aktivitas</string>
+    <string name="pick_category_add">Pilih Kategori</string>
+
+    <string name="dummy_username">Admin Nexora</string>
+    <string name="dummy_email">admin@nexora.com</string>
+    <string name="account">Akun</string>
+    <string name="notification">Notifikasi</string>
+    <string name="information_account">Informasi Akun</string>
+    <string name="support">Dukungan</string>
+    <string name="log_out">Keluar</string>
+</resources>
