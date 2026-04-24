@@ -41,7 +41,6 @@ class SessionManager(context: Context) {
 
     fun logout() {
         prefs.edit().clear().apply()
-        // Keep onboarding status even after logout? Usually yes.
         setOnboardingDone(true) 
     }
 }

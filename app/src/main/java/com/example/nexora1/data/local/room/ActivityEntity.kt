@@ -15,7 +15,7 @@ data class ActivityEntity(
     val moodRating: String? = null,
     val reminderTime: String? = null,
     val reminderDate: String? = null,
-    val userSelectedDate: String? = null, // Tambahkan ini untuk menyimpan waktu inputan user secara lokal
+    val userSelectedDate: String? = null,
     val isSynced: Boolean = true,
     val createdAt: String,
     val updatedAt: String,

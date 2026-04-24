@@ -25,7 +25,14 @@ class ActivityAdapter(
             val context = itemView.context
             binding.tvTitle.text = activity.title
             binding.tvDescription.text = activity.description
-            binding.tvTag.text = activity.categories
+
+            val tag = activity.categories
+            if (tag == "kesehatan"){
+                binding.tvTag.text = "Kesehatan"
+            } else {
+                binding.tvTag.text = "Produktif"
+            }
+
 
             val isDone = activity.status == "selesai" || activity.status == "3"
             binding.cbStatus.setOnClickListener(null)

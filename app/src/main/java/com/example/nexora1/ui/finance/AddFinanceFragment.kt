@@ -51,7 +51,6 @@ class AddFinanceFragment : Fragment() {
                 binding.tilAmount.editText?.setText(it.getString("amount"))
                 
                 originalDate = it.getString("date")
-                // Tampilan untuk user tetap hanya tanggal (YYYY-MM-DD)
                 binding.tilDate.editText?.setText(originalDate?.substringBefore("T"))
                 
                 binding.tilNote.editText?.setText(it.getString("note"))
@@ -114,7 +113,6 @@ class AddFinanceFragment : Fragment() {
         DatePickerDialog(requireContext(), { _, year, month, dayOfMonth ->
             val date = String.format("%04d-%02d-%02d", year, month + 1, dayOfMonth)
             binding.tilDate.editText?.setText(date)
-            // Jika user memilih tanggal baru, kita tidak lagi menggunakan originalDate yang lengkap
             originalDate = date 
         }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show()
     }
@@ -163,13 +161,10 @@ class AddFinanceFragment : Fragment() {
 
         val type = binding.root.findViewById<Chip>(selectedChipId).text.toString().lowercase()
         val amountClean = amountRaw.replace(Regex("[^0-9]"), "")
-        
-        // Kirim originalDate jika tidak diubah, atau dateText jika baru
-        // Jika server butuh ISO format, kita pastikan ada jamnya
+
         val finalDate = if (originalDate?.contains("T") == true && originalDate?.startsWith(dateText) == true) {
             originalDate!!
         } else {
-            // Jika format ringkas, tambahkan waktu default agar server tidak error "Invalid Date"
             "$dateText 00:00:00"
         }
         

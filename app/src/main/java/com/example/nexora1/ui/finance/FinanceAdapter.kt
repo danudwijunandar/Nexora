@@ -22,7 +22,13 @@ class FinanceAdapter(private val onItemClick: (FinanceData) -> Unit) : ListAdapt
             val context = itemView.context
             binding.tvNote.text = finance.note
             binding.tvCategory.text = finance.category
-            binding.tvType.text = finance.type
+
+            val type = finance.type
+            if (type == "pemasukan"){
+                binding.tvType.text = "Pemasukan"
+            } else {
+                binding.tvType.text = "Pengeluaran"
+            }
 
             binding.tvDate.text = formatDateTime(finance.createdAt)
 

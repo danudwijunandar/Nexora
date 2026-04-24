@@ -36,7 +36,7 @@ data class ActivityData(
     @SerializedName("mood_rating")
     val moodRating: String? = null,
     @SerializedName("date")
-    val date: String? = null, // Tambahkan ini untuk menangkap inputan waktu user
+    val date: String? = null,
     @SerializedName("createdAt")
     val createdAt: String,
     @SerializedName("updatedAt")

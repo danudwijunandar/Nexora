@@ -110,4 +110,5 @@
     <string name="save">Simpan</string>
     <string name="date">Tanggal</string>
     <string name="finance_amount_format">%s Rp %s</string>
+    <string name="healt">Kesehatan</string>
 </resources>

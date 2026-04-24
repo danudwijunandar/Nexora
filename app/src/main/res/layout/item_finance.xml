@@ -23,7 +23,7 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:maxLines="1"
-            android:text="Makan siang"
+            android:text="@string/category"
             android:textColor="@color/black"
             android:textSize="16sp"
             android:textStyle="bold"
@@ -38,7 +38,7 @@
             android:background="@drawable/bg_tag_gray"
             android:paddingHorizontal="12dp"
             android:paddingVertical="4dp"
-            android:text="Pengeluaran"
+            android:text="@string/expend"
             android:textColor="@color/text_gray"
             android:textSize="12sp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -51,7 +51,7 @@
             android:layout_marginTop="4dp"
             android:ellipsize="end"
             android:maxLines="1"
-            android:text="Makanan"
+            android:text="@string/notes"
             android:textColor="@color/text_gray"
             android:textSize="12sp"
             app:layout_constraintEnd_toStartOf="@+id/llAmount"
@@ -63,7 +63,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="26 Maret 2026"
+            android:text="@string/date"
             android:textColor="@color/text_gray"
             android:textSize="14sp"
             app:layout_constraintStart_toStartOf="parent"
@@ -90,12 +90,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:text="Rp 35.000"
+                android:text="@string/amount"
                 android:textColor="@color/red"
                 android:textSize="16sp"
                 android:textStyle="bold" />
         </LinearLayout>
-
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 </com.google.android.material.card.MaterialCardView>

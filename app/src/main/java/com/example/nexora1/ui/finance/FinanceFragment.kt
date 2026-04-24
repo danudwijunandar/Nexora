@@ -63,7 +63,6 @@ class FinanceFragment : Fragment() {
                 putString("type", finance.type)
                 putString("category", finance.category)
                 putString("amount", finance.amount)
-                // Kirim tanggal lengkap tanpa dipotong agar formatnya tetap valid bagi server
                 putString("date", finance.date)
                 putString("note", finance.note)
             }

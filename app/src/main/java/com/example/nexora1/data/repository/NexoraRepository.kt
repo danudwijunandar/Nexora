@@ -17,7 +17,6 @@ class NexoraRepository(
     private val userDao: UserDao
 ) {
     private val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-    private val sdfDateOnly = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
 
     suspend fun login(email: String, pass: String): Result<LoginResponse> {
         return try {
