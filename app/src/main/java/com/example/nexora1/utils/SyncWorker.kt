@@ -16,7 +16,6 @@ class SyncWorker(context: Context, params: WorkerParameters) : CoroutineWorker(c
         val apiService = ApiConfig.getApiService()
 
         try {
-            // Sync Finance yang belum tersinkron
             val unsyncedFinance = database.financeDao().getUnsyncedFinance()
             unsyncedFinance.forEach { finance ->
                 val response = apiService.createFinance(

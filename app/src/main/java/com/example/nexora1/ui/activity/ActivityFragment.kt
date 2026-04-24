@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -74,13 +75,37 @@ class ActivityFragment : Fragment() {
                 findNavController().navigate(R.id.addActivityFragment, bundle)
             },
             onStatusChange = { activity, isChecked ->
-                val token = sessionManager.getToken() ?: ""
-                val status = if (isChecked) "3" else "1"
-                viewModel.updateActivityStatus(token, activity.id, activity.title, status)
+                showStatusConfirmation(activity, isChecked)
             }
         )
         binding.rvTask.layoutManager = LinearLayoutManager(context)
         binding.rvTask.adapter = adapter
+    }
+
+    private fun showStatusConfirmation(activity: ActivityData, isChecked: Boolean) {
+        if (isChecked) {
+            AlertDialog.Builder(requireContext())
+                .setTitle("Konfirmasi")
+                .setMessage("Apakah anda sudah menyelesaikan aktivitas ini?")
+                .setPositiveButton("Ya") { _, _ ->
+                    updateStatus(activity, true)
+                }
+                .setNegativeButton("Tidak") { _, _ ->
+                    viewModel.syncActivities(sessionManager.getToken() ?: "")
+                }
+                .setOnCancelListener {
+                    viewModel.syncActivities(sessionManager.getToken() ?: "")
+                }
+                .show()
+        } else {
+            updateStatus(activity, false)
+        }
+    }
+
+    private fun updateStatus(activity: ActivityData, isDone: Boolean) {
+        val token = sessionManager.getToken() ?: ""
+        val status = if (isDone) "3" else "1"
+        viewModel.updateActivityStatus(token, activity.id, activity.title, status)
     }
 
     private fun setupCalendar() {
@@ -95,10 +120,15 @@ class ActivityFragment : Fragment() {
 
     private fun applyFilters() {
         val filteredList = fullList.filter {
-            it.createdAt.startsWith(selectedDate)
-        }
+            val dateToCheck = it.date ?: it.createdAt
+            dateToCheck.startsWith(selectedDate)
+        }.sortedWith(compareBy<ActivityData> {
+            if (it.status == "selesai" || it.status == "3") 1 else 0
+        }.thenByDescending {
+            it.date ?: it.createdAt
+        })
+        
         adapter.submitList(filteredList)
-        // Check if rvTask has a placeholder or if I should just rely on adapter's empty state
     }
 
     private fun observeViewModel() {
@@ -107,16 +137,16 @@ class ActivityFragment : Fragment() {
             applyFilters()
         }
 
-        viewModel.updateStatusResult.observe(viewLifecycleOwner) { result ->
-            when (result) {
-                is Result.Loading -> {
-                    // Show loading if needed
-                }
-                is Result.Success -> {
-                    Toast.makeText(requireContext(), "Aktivitas '${result.data}' diperbarui", Toast.LENGTH_SHORT).show()
-                }
-                is Result.Error -> {
-                    Toast.makeText(requireContext(), result.error, Toast.LENGTH_SHORT).show()
+        viewModel.updateStatusResult.observe(viewLifecycleOwner) { event ->
+            event.getContentIfNotHandled()?.let { result ->
+                when (result) {
+                    is Result.Loading -> {}
+                    is Result.Success -> {
+                        Toast.makeText(requireContext(), "Aktivitas '${result.data}' diperbarui", Toast.LENGTH_SHORT).show()
+                    }
+                    is Result.Error -> {
+                        Toast.makeText(requireContext(), result.error, Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
         }

@@ -1,5 +1,7 @@
 package com.example.nexora1.ui.activity
 
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
@@ -11,6 +13,7 @@ import com.example.nexora1.data.remote.response.ActivityData
 import com.example.nexora1.databinding.ItemListBinding
 import java.text.SimpleDateFormat
 import java.util.Locale
+import java.util.TimeZone
 
 class ActivityAdapter(
     private val onItemClick: (ActivityData) -> Unit,
@@ -19,30 +22,57 @@ class ActivityAdapter(
 
     inner class ActivityViewHolder(private val binding: ItemListBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(activity: ActivityData) {
+            val context = itemView.context
             binding.tvTitle.text = activity.title
             binding.tvDescription.text = activity.description
             binding.tvTag.text = activity.categories
-            
-            // Status logic: if status is empty, null or 1 it is unchecked
-            val isDone = activity.status == "selesai" || activity.status == "3"
-            binding.cbStatus.setOnCheckedChangeListener(null) // Reset listener
-            binding.cbStatus.isChecked = isDone
-            
-            // Format date
-            try {
-                val inputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-                val outputFormat = SimpleDateFormat("dd MMMM yyyy", Locale("id", "ID"))
-                val date = inputFormat.parse(activity.createdAt)
-                binding.tvDate.text = if (date != null) outputFormat.format(date) else activity.createdAt
-            } catch (e: Exception) {
-                binding.tvDate.text = activity.createdAt
-            }
-            
-            val context = itemView.context
-            binding.tvTag.setBackgroundResource(R.drawable.bg_tag_gray)
-            binding.tvTag.setTextColor(ContextCompat.getColor(context, R.color.text_gray))
 
-            binding.cbStatus.setOnCheckedChangeListener { _, isChecked ->
+            val isDone = activity.status == "selesai" || activity.status == "3"
+            binding.cbStatus.setOnClickListener(null)
+            binding.cbStatus.isChecked = isDone
+
+            binding.mainCard.setCardBackgroundColor(ContextCompat.getColor(context, R.color.white))
+            binding.tvTitle.setTextColor(ContextCompat.getColor(context, R.color.black))
+            binding.tvDescription.setTextColor(ContextCompat.getColor(context, R.color.text_gray))
+            binding.tvDate.setTextColor(ContextCompat.getColor(context, R.color.text_gray))
+
+            val category = activity.categories.lowercase()
+            if (category.contains("produktif")) {
+                val productiveColor = Color.parseColor("#00E2FB")
+                val transparentProductive = Color.argb(40, Color.red(productiveColor), Color.green(productiveColor), Color.blue(productiveColor))
+                binding.tvTag.backgroundTintList = ColorStateList.valueOf(transparentProductive)
+                binding.tvTag.setTextColor(productiveColor)
+            } else if (category.contains("kesehatan")) {
+                val greenColor = ContextCompat.getColor(context, R.color.green)
+                val transparentGreen = Color.argb(40, Color.red(greenColor), Color.green(greenColor), Color.blue(greenColor))
+                binding.tvTag.backgroundTintList = ColorStateList.valueOf(transparentGreen)
+                binding.tvTag.setTextColor(greenColor)
+            } else {
+                binding.tvTag.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.bg_color))
+                binding.tvTag.setTextColor(ContextCompat.getColor(context, R.color.text_gray))
+            }
+
+            val timeSource = activity.date ?: activity.createdAt
+            try {
+                val formats = arrayOf("yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", "yyyy-MM-dd'T'HH:mm:ss")
+                var parsedDate: java.util.Date? = null
+                for (format in formats) {
+                    try {
+                        val sdf = SimpleDateFormat(format, Locale.getDefault())
+                        if (format.contains("Z") || format.contains("T")) sdf.timeZone = TimeZone.getTimeZone("UTC")
+                        parsedDate = sdf.parse(timeSource)
+                        if (parsedDate != null) break
+                    } catch (e: Exception) { continue }
+                }
+                val outputFormat = SimpleDateFormat("dd MMMM yyyy, HH:mm", Locale("id", "ID"))
+                binding.tvDate.text = if (parsedDate != null) outputFormat.format(parsedDate) else timeSource
+            } catch (e: Exception) {
+                binding.tvDate.text = timeSource
+            }
+
+            binding.cbStatus.setOnClickListener {
+                val isChecked = binding.cbStatus.isChecked
+                binding.cbStatus.isChecked = !isChecked
                 onStatusChange(activity, isChecked)
             }
 

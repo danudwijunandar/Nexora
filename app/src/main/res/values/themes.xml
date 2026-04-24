@@ -11,6 +11,21 @@
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
-        <!-- Customize your theme here. -->
+        
+        <!-- Picker themes -->
+        <item name="android:datePickerDialogTheme">@style/CustomPickerTheme</item>
+        <item name="android:timePickerDialogTheme">@style/CustomPickerTheme</item>
+    </style>
+
+    <style name="CustomPickerTheme" parent="Theme.MaterialComponents.Light.Dialog">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorAccent">@color/colorPrimary</item>
+        <!-- Mengatur warna teks tombol positif (OK) dan negatif (Batal) -->
+        <item name="android:buttonBarPositiveButtonStyle">@style/PickerButtonStyle</item>
+        <item name="android:buttonBarNegativeButtonStyle">@style/PickerButtonStyle</item>
+    </style>
+
+    <style name="PickerButtonStyle" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:textColor">@color/black</item>
     </style>
 </resources>

@@ -23,9 +23,6 @@ class AuthViewModel(private val repository: NexoraRepository) : ViewModel() {
         _loginResult.value = Result.Loading
         viewModelScope.launch {
             try {
-                // Ideally, Auth should also be in NexoraRepository. 
-                // Let's add it there or use ApiService directly if repository doesn't have it.
-                // Since I'm refactoring for "structure", I'll add auth to repository.
                 val result = repository.login(email, pass)
                 _loginResult.value = result
             } catch (e: Exception) {

@@ -34,13 +34,14 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:src="@drawable/ic_finance"
+                    android:contentDescription="@string/chip_activity_finance"
                     app:tint="@color/white" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
-                    android:text="Total balance"
+                    android:text="@string/total_balance"
                     android:textColor="#CCFFFFFF"
                     android:textSize="14sp" />
             </LinearLayout>
@@ -50,7 +51,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="Rp 0"
+                android:text="@string/dummy_amount"
                 android:textColor="@color/white"
                 android:textSize="28sp"
                 android:textStyle="bold" />
@@ -59,6 +60,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
+                android:baselineAligned="false"
                 android:orientation="horizontal"
                 android:weightSum="2">
 
@@ -70,8 +72,9 @@
                     android:orientation="horizontal">
 
                     <ImageView
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:contentDescription="@string/income"
                         android:padding="6dp"
                         android:src="@drawable/ic_income"
                         app:tint="@color/white" />
@@ -85,15 +88,15 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Pemasukan"
+                            android:text="@string/income"
                             android:textColor="#CCFFFFFF"
-                            android:textSize="10sp" />
+                            android:textSize="12sp" />
 
                         <TextView
                             android:id="@+id/tvTotalIncome"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Rp 0"
+                            android:text="@string/dummy_amount"
                             android:textColor="@color/white"
                             android:textSize="14sp"
                             android:textStyle="bold" />
@@ -108,8 +111,9 @@
                     android:orientation="horizontal">
 
                     <ImageView
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:contentDescription="@string/expend"
                         android:padding="6dp"
                         android:src="@drawable/ic_expense"
                         app:tint="@color/white" />
@@ -123,15 +127,15 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Pengeluaran"
+                            android:text="@string/expend"
                             android:textColor="#CCFFFFFF"
-                            android:textSize="10sp" />
+                            android:textSize="12sp" />
 
                         <TextView
                             android:id="@+id/tvTotalExpense"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Rp 0"
+                            android:text="@string/dummy_amount"
                             android:textColor="@color/white"
                             android:textSize="14sp"
                             android:textStyle="bold" />
@@ -150,7 +154,7 @@
         android:background="@drawable/bg_solid_card"
         app:iconifiedByDefault="false"
         app:queryBackground="@android:color/transparent"
-        app:queryHint="cari aktivitas keuangan anda"
+        app:queryHint="Cari aktivitas keuangan anda"
         app:layout_constraintTop_toBottomOf="@id/cvSummary" />
 
     <com.google.android.material.chip.ChipGroup
@@ -167,7 +171,7 @@
             style="@style/Widget.MaterialComponents.Chip.Choice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Semua"
+            android:text="@string/chip_activity_all"
             android:checked="true" />
 
         <com.google.android.material.chip.Chip
@@ -175,14 +179,14 @@
             style="@style/Widget.MaterialComponents.Chip.Choice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Pemasukan" />
+            android:text="@string/income" />
 
         <com.google.android.material.chip.Chip
             android:id="@+id/chipExpense"
             style="@style/Widget.MaterialComponents.Chip.Choice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Pengeluaran" />
+            android:text="@string/expend" />
     </com.google.android.material.chip.ChipGroup>
 
     <androidx.recyclerview.widget.RecyclerView

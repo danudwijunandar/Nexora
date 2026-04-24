@@ -41,7 +41,6 @@ class UpdatePasswordFragment : Fragment() {
         val confirm = binding.tilConfirmPassword.editText?.text.toString().trim()
         val token = sessionManager.getToken() ?: ""
 
-        // Reset error
         binding.tilNewPassword.error = null
 
         if (oldPass.isEmpty() || newPass.isEmpty() || confirm.isEmpty()) {
@@ -49,7 +48,6 @@ class UpdatePasswordFragment : Fragment() {
             return
         }
 
-        // VALIDASI ANGKA PADA PASSWORD BARU
         if (!newPass.any { it.isDigit() }) {
             binding.tilNewPassword.error = "Password harus mengandung minimal satu angka"
             return

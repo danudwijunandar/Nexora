@@ -8,6 +8,9 @@ interface ActivityDao {
     @Query("SELECT * FROM activities ORDER BY id DESC")
     fun getAllActivities(): Flow<List<ActivityEntity>>
 
+    @Query("SELECT * FROM activities")
+    suspend fun getAllActivitiesOnce(): List<ActivityEntity>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertActivities(activities: List<ActivityEntity>)
 

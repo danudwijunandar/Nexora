@@ -39,6 +39,17 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/btnBack" />
 
+    <ImageView
+        android:id="@+id/btnDelete"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:src="@android:drawable/ic_menu_delete"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/btnBack"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/btnBack"
+        app:tint="@color/red" />
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -210,13 +221,6 @@
                         android:text="Belum Dikerjakan" />
 
                     <com.google.android.material.chip.Chip
-                        android:id="@+id/chipWorking"
-                        style="@style/Widget.MaterialComponents.Chip.Choice"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Sedang Dikerjakan" />
-
-                    <com.google.android.material.chip.Chip
                         android:id="@+id/chipDone"
                         style="@style/Widget.MaterialComponents.Chip.Choice"
                         android:layout_width="wrap_content"
@@ -224,18 +228,6 @@
                         android:text="Selesai" />
                 </com.google.android.material.chip.ChipGroup>
             </LinearLayout>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnDelete"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:text="Hapus Aktivitas Ini"
-                android:textColor="@color/red"
-                android:visibility="gone"
-                app:icon="@android:drawable/ic_menu_delete"
-                app:iconTint="@color/red" />
 
         </LinearLayout>
     </ScrollView>

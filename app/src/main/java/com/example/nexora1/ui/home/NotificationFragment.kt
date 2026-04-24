@@ -4,11 +4,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.nexora1.data.local.room.NexoraDatabase
+import com.example.nexora1.data.local.room.NotificationEntity
 import com.example.nexora1.databinding.FragmentNotificationBinding
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -41,9 +43,28 @@ class NotificationFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        adapter = NotificationAdapter()
+        adapter = NotificationAdapter { notification ->
+            showDeleteDialog(notification)
+        }
         binding.rvNotification.layoutManager = LinearLayoutManager(context)
         binding.rvNotification.adapter = adapter
+    }
+
+    private fun showDeleteDialog(notification: NotificationEntity) {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Hapus Notifikasi")
+            .setMessage("Hapus notifikasi ini?")
+            .setPositiveButton("Ya") { _, _ ->
+                deleteNotification(notification)
+            }
+            .setNegativeButton("Tidak", null)
+            .show()
+    }
+
+    private fun deleteNotification(notification: NotificationEntity) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            database.notificationDao().deleteNotification(notification)
+        }
     }
 
     private fun observeNotifications() {

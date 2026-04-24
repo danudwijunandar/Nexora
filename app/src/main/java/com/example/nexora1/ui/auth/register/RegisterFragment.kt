@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.example.nexora1.R
 import com.example.nexora1.data.Result
 import com.example.nexora1.databinding.FragmentRegisterBinding
 import com.example.nexora1.ui.ViewModelFactory
@@ -49,6 +50,11 @@ class RegisterFragment : Fragment() {
                 return@setOnClickListener
             }
 
+            if (!binding.checkBox.isChecked) {
+                Toast.makeText(requireContext(), "Harap setujui Syarat dan Ketentuan", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
             viewModel.register(username, email, password, confirm)
         }
 
@@ -60,12 +66,18 @@ class RegisterFragment : Fragment() {
             when (result) {
                 is Result.Loading -> {
                     binding.btnSignUp.isEnabled = false
+                    binding.btnSignUp.text = ""
+                    binding.progressBar.visibility = View.VISIBLE
                 }
                 is Result.Success -> {
+                    binding.progressBar.visibility = View.GONE
+                    binding.btnSignUp.text = getString(R.string.btn_register)
                     Toast.makeText(requireContext(), "Registrasi Berhasil!", Toast.LENGTH_SHORT).show()
                     findNavController().navigateUp()
                 }
                 is Result.Error -> {
+                    binding.progressBar.visibility = View.GONE
+                    binding.btnSignUp.text = getString(R.string.btn_register)
                     binding.btnSignUp.isEnabled = true
                     Toast.makeText(requireContext(), result.error, Toast.LENGTH_SHORT).show()
                 }

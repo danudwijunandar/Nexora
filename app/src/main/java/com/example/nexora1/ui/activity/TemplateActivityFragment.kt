@@ -26,12 +26,12 @@ class TemplateActivityFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val templates = listOf(
-            ActivityTemplate("Minum air putih, jaga kesehatan", R.drawable.ic_activity, "kesehatan"),
-            ActivityTemplate("Menyikat gigi", R.drawable.ic_activity, "kesehatan"),
-            ActivityTemplate("Mandi", R.drawable.ic_activity, "kesehatan"),
+            ActivityTemplate("Minum air putih", R.drawable.ic_activity, "kesehatan"),
+            ActivityTemplate("Jalan pagi", R.drawable.ic_activity, "kesehatan"),
+            ActivityTemplate("Evaluasi diri", R.drawable.ic_activity, "kesehatan"),
             ActivityTemplate("Pergi tidur lebih awal", R.drawable.ic_activity, "kesehatan"),
             ActivityTemplate("Bangun pagi", R.drawable.ic_activity, "kesehatan"),
-            ActivityTemplate("Ambil Pengingat Pil", R.drawable.ic_activity, "kesehatan"),
+            ActivityTemplate("Olahraga", R.drawable.ic_activity, "kesehatan"),
             ActivityTemplate("Istirahat", R.drawable.ic_activity, "kesehatan"),
             ActivityTemplate("Makan buah-buahan", R.drawable.ic_activity, "kesehatan")
         )

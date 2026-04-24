@@ -1,5 +1,7 @@
 package com.example.nexora1.ui.finance
 
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
@@ -11,46 +13,72 @@ import com.example.nexora1.data.remote.response.FinanceData
 import com.example.nexora1.databinding.ItemFinanceBinding
 import java.text.SimpleDateFormat
 import java.util.Locale
+import java.util.TimeZone
 
 class FinanceAdapter(private val onItemClick: (FinanceData) -> Unit) : ListAdapter<FinanceData, FinanceAdapter.FinanceViewHolder>(DiffCallback) {
 
     inner class FinanceViewHolder(private val binding: ItemFinanceBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(finance: FinanceData) {
+            val context = itemView.context
             binding.tvNote.text = finance.note
             binding.tvCategory.text = finance.category
-            
-            // Format date if needed, assuming finance.date is "yyyy-MM-dd" or similar
-            // For now displaying as is or trying to parse
-            try {
-                val inputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-                val outputFormat = SimpleDateFormat("dd MMMM yyyy", Locale("id", "ID"))
-                val date = inputFormat.parse(finance.date)
-                binding.tvDate.text = if (date != null) outputFormat.format(date) else finance.date
-            } catch (e: Exception) {
-                binding.tvDate.text = finance.date
-            }
+            binding.tvType.text = finance.type
 
-            binding.tvAmount.text = "Rp ${finance.amount}"
-            
-            val isPemasukan = finance.type.lowercase() == "pemasukan"
+            binding.tvDate.text = formatDateTime(finance.createdAt)
+
+            val isPemasukan = checkIfIncome(finance)
             
             val color = if (isPemasukan) {
-                ContextCompat.getColor(itemView.context, R.color.green)
+                ContextCompat.getColor(context, R.color.green)
             } else {
-                ContextCompat.getColor(itemView.context, R.color.red)
+                ContextCompat.getColor(context, R.color.red)
             }
-            
-            binding.tvAmount.setTextColor(color)
-            
-            val iconRes = if (isPemasukan) {
-                R.drawable.ic_income
-            } else {
-                R.drawable.ic_expense
-            }
-            binding.ivFinanceType.setImageResource(iconRes)
-            binding.ivFinanceType.setColorFilter(color)
+
+            setTagStyle(color)
+            setAmountStyle(finance.amount, isPemasukan, color)
+            setIconStyle(isPemasukan, color)
 
             itemView.setOnClickListener { onItemClick(finance) }
+        }
+
+        private fun formatDateTime(dateTime: String): String {
+            val formats = arrayOf("yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", "yyyy-MM-dd'T'HH:mm:ss")
+            var parsedDate: java.util.Date? = null
+            for (format in formats) {
+                try {
+                    val sdf = SimpleDateFormat(format, Locale.getDefault())
+                    if (format.contains("Z") || format.contains("T")) sdf.timeZone = TimeZone.getTimeZone("UTC")
+                    parsedDate = sdf.parse(dateTime)
+                    if (parsedDate != null) break
+                } catch (e: Exception) { continue }
+            }
+            val outputFormat = SimpleDateFormat("dd MMMM yyyy, HH:mm", Locale("id", "ID"))
+            return if (parsedDate != null) outputFormat.format(parsedDate) else dateTime
+        }
+
+        private fun checkIfIncome(finance: FinanceData): Boolean {
+            val type = finance.type.lowercase()
+            val category = finance.category.lowercase()
+            return type.contains("pemasukan") || type.contains("pemasukkan") ||
+                   category.contains("pemasukan") || category.contains("pemasukkan")
+        }
+
+        private fun setTagStyle(color: Int) {
+            val transparentColor = Color.argb(40, Color.red(color), Color.green(color), Color.blue(color))
+            binding.tvType.backgroundTintList = ColorStateList.valueOf(transparentColor)
+            binding.tvType.setTextColor(color)
+        }
+
+        private fun setAmountStyle(amount: String, isIncome: Boolean, color: Int) {
+            val prefix = if (isIncome) "+" else "-"
+            binding.tvAmount.text = itemView.context.getString(R.string.finance_amount_format, prefix, amount)
+            binding.tvAmount.setTextColor(color)
+        }
+
+        private fun setIconStyle(isIncome: Boolean, color: Int) {
+            val iconRes = if (isIncome) R.drawable.ic_income else R.drawable.ic_expense
+            binding.ivFinanceType.setImageResource(iconRes)
+            binding.ivFinanceType.setColorFilter(color)
         }
     }
 

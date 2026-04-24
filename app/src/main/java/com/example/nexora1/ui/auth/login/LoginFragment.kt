@@ -59,8 +59,12 @@ class LoginFragment : Fragment() {
             when (result) {
                 is Result.Loading -> {
                     binding.btnLogin.isEnabled = false
+                    binding.btnLogin.text = ""
+                    binding.progressBar.visibility = View.VISIBLE
                 }
                 is Result.Success -> {
+                    binding.progressBar.visibility = View.GONE
+                    binding.btnLogin.text = getString(R.string.btn_login)
                     val loginResponse = result.data
                     sessionManager.saveSession(
                         loginResponse.token ?: "",
@@ -72,6 +76,8 @@ class LoginFragment : Fragment() {
                     requireActivity().finish()
                 }
                 is Result.Error -> {
+                    binding.progressBar.visibility = View.GONE
+                    binding.btnLogin.text = getString(R.string.btn_login)
                     binding.btnLogin.isEnabled = true
                     Toast.makeText(requireContext(), result.error, Toast.LENGTH_SHORT).show()
                 }

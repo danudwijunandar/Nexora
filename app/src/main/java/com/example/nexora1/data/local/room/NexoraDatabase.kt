@@ -5,7 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [ActivityEntity::class, UserEntity::class, FinanceEntity::class, NotificationEntity::class], version = 6, exportSchema = false)
+@Database(entities = [ActivityEntity::class, UserEntity::class, FinanceEntity::class, NotificationEntity::class], version = 8, exportSchema = false)
 abstract class NexoraDatabase : RoomDatabase() {
     abstract fun activityDao(): ActivityDao
     abstract fun userDao(): UserDao
@@ -29,5 +29,6 @@ abstract class NexoraDatabase : RoomDatabase() {
                 instance
             }
         }
+        fun getDatabase(context: Context): NexoraDatabase = getInstance(context)
     }
 }

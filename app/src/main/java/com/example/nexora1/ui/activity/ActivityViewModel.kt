@@ -8,15 +8,19 @@ import androidx.lifecycle.viewModelScope
 import com.example.nexora1.data.Result
 import com.example.nexora1.data.remote.response.ActivityData
 import com.example.nexora1.data.repository.NexoraRepository
+import com.example.nexora1.utils.Event
 import kotlinx.coroutines.launch
 
 class ActivityViewModel(private val repository: NexoraRepository) : ViewModel() {
 
-    private val _addActivityResult = MutableLiveData<Result<Boolean>>()
-    val addActivityResult: LiveData<Result<Boolean>> = _addActivityResult
+    private val _addActivityResult = MutableLiveData<Event<Result<ActivityData>>>()
+    val addActivityResult: LiveData<Event<Result<ActivityData>>> = _addActivityResult
 
-    private val _updateStatusResult = MutableLiveData<Result<String>>()
-    val updateStatusResult: LiveData<Result<String>> = _updateStatusResult
+    private val _updateStatusResult = MutableLiveData<Event<Result<String>>>()
+    val updateStatusResult: LiveData<Event<Result<String>>> = _updateStatusResult
+
+    private val _deleteActivityResult = MutableLiveData<Event<Result<Boolean>>>()
+    val deleteActivityResult: LiveData<Event<Result<Boolean>>> = _deleteActivityResult
 
     fun getActivities(): LiveData<List<ActivityData>> {
         return repository.getLocalActivities().asLiveData()
@@ -29,33 +33,49 @@ class ActivityViewModel(private val repository: NexoraRepository) : ViewModel() 
     }
 
     fun addActivity(token: String, title: String, description: String, category: String, date: String? = null) {
-        _addActivityResult.value = Result.Loading
+        _addActivityResult.value = Event(Result.Loading)
         viewModelScope.launch {
             try {
-                val success = repository.addActivity(token, title, description, category, date)
-                if (success) {
-                    _addActivityResult.value = Result.Success(true)
+                val activity = repository.addActivityWithReturn(token, title, description, category, date)
+                if (activity != null) {
+                    _addActivityResult.value = Event(Result.Success(activity))
                 } else {
-                    _addActivityResult.value = Result.Error("Gagal menambahkan aktivitas")
+                    _addActivityResult.value = Event(Result.Error("Gagal menambahkan aktivitas"))
                 }
             } catch (e: Exception) {
-                _addActivityResult.value = Result.Error(e.message ?: "Terjadi kesalahan")
+                _addActivityResult.value = Event(Result.Error(e.message ?: "Terjadi kesalahan"))
             }
         }
     }
 
     fun updateActivityStatus(token: String, id: Int, title: String, status: String) {
-        _updateStatusResult.value = Result.Loading
+        _updateStatusResult.value = Event(Result.Loading)
         viewModelScope.launch {
             try {
                 val success = repository.updateActivityStatus(token, id, title, status)
                 if (success) {
-                    _updateStatusResult.value = Result.Success(title)
+                    _updateStatusResult.value = Event(Result.Success(title))
                 } else {
-                    _updateStatusResult.value = Result.Error("Gagal memperbarui status")
+                    _updateStatusResult.value = Event(Result.Error("Gagal memperbarui status"))
                 }
             } catch (e: Exception) {
-                _updateStatusResult.value = Result.Error(e.message ?: "Gagal memperbarui status")
+                _updateStatusResult.value = Event(Result.Error(e.message ?: "Gagal memperbarui status"))
+            }
+        }
+    }
+
+    fun deleteActivity(token: String, id: Int) {
+        _deleteActivityResult.value = Event(Result.Loading)
+        viewModelScope.launch {
+            try {
+                val success = repository.deleteActivity(token, id)
+                if (success) {
+                    _deleteActivityResult.value = Event(Result.Success(true))
+                } else {
+                    _deleteActivityResult.value = Event(Result.Error("Gagal menghapus aktivitas"))
+                }
+            } catch (e: Exception) {
+                _deleteActivityResult.value = Event(Result.Error(e.message ?: "Terjadi kesalahan"))
             }
         }
     }

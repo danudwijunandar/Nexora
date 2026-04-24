@@ -4,9 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.LinearLayout
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
@@ -45,13 +42,9 @@ class OnboardingFragment : Fragment() {
         val adapter = OnboardingAdapter(items)
         binding.viewPager.adapter = adapter
 
-        setupIndicators(items.size)
-        setCurrentIndicator(0)
-
         binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
-                setCurrentIndicator(position)
                 if (position == items.size - 1) {
                     binding.btnNext.text = getString(R.string.btn_login)
                 } else {
@@ -70,41 +63,6 @@ class OnboardingFragment : Fragment() {
 
         binding.tvSkip.setOnClickListener {
             completeOnboarding()
-        }
-    }
-
-    private fun setupIndicators(size: Int) {
-        val indicators = arrayOfNulls<ImageView>(size)
-        val layoutParams: LinearLayout.LayoutParams =
-            LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
-        layoutParams.setMargins(8, 0, 8, 0)
-        for (i in indicators.indices) {
-            indicators[i] = ImageView(requireContext())
-            indicators[i]?.apply {
-                setImageDrawable(
-                    ContextCompat.getDrawable(
-                        requireContext(),
-                        R.drawable.ic_launcher_background // Using a placeholder, should be a dot
-                    )
-                )
-                this.layoutParams = layoutParams
-            }
-            binding.layoutIndicators.addView(indicators[i])
-        }
-    }
-
-    private fun setCurrentIndicator(index: Int) {
-        val childCount = binding.layoutIndicators.childCount
-        for (i in 0 until childCount) {
-            val imageView = binding.layoutIndicators.getChildAt(i) as ImageView
-            if (i == index) {
-                imageView.alpha = 1f
-            } else {
-                imageView.alpha = 0.5f
-            }
         }
     }
 

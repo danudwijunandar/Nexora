@@ -24,22 +24,30 @@
 
     <string name="remember_me">Ingat saya</string>
 
+    <!-- Bottom Navigation -->
     <string name="home">Beranda</string>
     <string name="activity">Aktivitas</string>
     <string name="Profile">Profil</string>
     <string name="greeting_user">Halo, User!</string>
     <string name="home_subtitle">Ayo selesaikan tugasmu hari ini</string>
-    <string name="my_activity">Aktivitas Saya</string>
+    <string name="my_activity">Aktivitas</string>
     <string name="number_of_activity">0</string>
-    <string name="my_productivity">Produktivitas</string>
+    <string name="my_productivity">Produktif</string>
     <string name="productivity_percentage">0%</string>
     <string name="title_progress">Progress Mingguan</string>
+
+    <string name="today">Hari Ini</string>
+    <string name="this_week">Minggu Ini</string>
+    <string name="this_mounth">Bulan Ini</string>
+    <string name="task_today">Tugas Hari Ini</string>
 
     <string name="chip_monday">Sen</string>
     <string name="chip_tuesday">Sel</string>
     <string name="chip_wednesday">Rab</string>
     <string name="chip_thursday">Kam</string>
     <string name="chip_friday">Jum</string>
+    <string name="chip_saturday">Sab</string>
+    <string name="chip_sunday">Min</string>
 
     <string name="title_activity">Aktivitas</string>
     <string name="subtitle_activity">Kelola semua aktivitasmu di sini</string>
@@ -62,4 +70,44 @@
     <string name="information_account">Informasi Akun</string>
     <string name="support">Dukungan</string>
     <string name="log_out">Keluar</string>
+
+    <!-- Activity Fragment Strings -->
+    <string name="edit_activity_title">Ubah detail activities</string>
+    <string name="edit_activity_button">Ubah detail activities</string>
+    <string name="delete_activity_dialog_title">Hapus Aktivitas</string>
+    <string name="delete_activity_dialog_message">Apakah anda yakin ingin menghapus aktivitas ini?</string>
+    <string name="yes">Ya</string>
+    <string name="no">Tidak</string>
+    <string name="activity_saved_success">Berhasil menyimpan aktivitas</string>
+    <string name="activity_updated_success">Berhasil diperbarui</string>
+    <string name="activity_deleted_success">Aktivitas berhasil dihapus</string>
+    <string name="title_empty_error">Harap isi judul aktivitas</string>
+    <string name="reminder_label">Pengingat: %s</string>
+
+    <!-- Finance Fragment Strings -->
+    <string name="add_finance_title">Tambah Keuangan</string>
+    <string name="edit_finance_title">Edit Keuangan</string>
+    <string name="finance_saved_success">Data berhasil diproses</string>
+    <string name="select_type_error">Pilih tipe (Pemasukan/Pengeluaran)</string>
+    <string name="category_empty_error">Kategori harus diisi</string>
+    <string name="amount_empty_error">Jumlah harus diisi</string>
+    <string name="date_empty_error">Tanggal harus diisi</string>
+    <string name="note_empty_error">Catatan harus diisi</string>
+    <string name="total_balance">Total balance</string>
+    <string name="dummy_amount">Rp 0</string>
+    <string name="income">Pemasukan</string>
+    <string name="expend">Pengeluaran</string>
+    <string name="_0">0</string>
+    <string name="add_finance">Tambah Keuangan</string>
+    <string name="tipe">Tipe</string>
+    <string name="category">Kategori</string>
+    <string name="dummy_finance_title">Contoh: Gaji, Makan, dll</string>
+    <string name="amount">"Jumlah "</string>
+    <string name="dummy_rp">"Rp: "</string>
+    <string name="format_date">YYYY-MM-DD</string>
+    <string name="notes">Catatan</string>
+    <string name="hint_motes">Masukkan catatan keuangan</string>
+    <string name="save">Simpan</string>
+    <string name="date">Tanggal</string>
+    <string name="finance_amount_format">%s Rp %s</string>
 </resources>

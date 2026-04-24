@@ -63,7 +63,8 @@ class FinanceFragment : Fragment() {
                 putString("type", finance.type)
                 putString("category", finance.category)
                 putString("amount", finance.amount)
-                putString("date", finance.date.substringBefore("T"))
+                // Kirim tanggal lengkap tanpa dipotong agar formatnya tetap valid bagi server
+                putString("date", finance.date)
                 putString("note", finance.note)
             }
             findNavController().navigate(R.id.addFinanceFragment, bundle)
@@ -73,6 +74,7 @@ class FinanceFragment : Fragment() {
     }
 
     private fun setupSearch() {
+        binding.searchFinance.setQueryHint("Cari aktivitas keuangan anda")
         binding.searchFinance.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean = false
 
@@ -118,8 +120,13 @@ class FinanceFragment : Fragment() {
 
         if (checkedChipId != View.NO_ID) {
             when (checkedChipId) {
-                R.id.chipIncome -> filteredList = filteredList.filter { it.type.lowercase() == "pemasukan" }
-                R.id.chipExpense -> filteredList = filteredList.filter { it.type.lowercase() == "pengeluaran" }
+                R.id.chipIncome -> filteredList = filteredList.filter { 
+                    it.type.lowercase().contains("pemasukan") || it.type.lowercase().contains("pemasukkan") ||
+                    it.category.lowercase().contains("pemasukan") || it.category.lowercase().contains("pemasukkan")
+                }
+                R.id.chipExpense -> filteredList = filteredList.filter { 
+                    it.type.lowercase().contains("pengeluaran") || it.category.lowercase().contains("pengeluaran")
+                }
             }
         }
 
@@ -138,7 +145,12 @@ class FinanceFragment : Fragment() {
 
         list.forEach {
             val amount = it.amount.replace(Regex("[^0-9]"), "").toLongOrNull() ?: 0L
-            if (it.type.lowercase() == "pemasukan") {
+            val isPemasukan = it.type.lowercase().contains("pemasukan") || 
+                             it.type.lowercase().contains("pemasukkan") ||
+                             it.category.lowercase().contains("pemasukan") ||
+                             it.category.lowercase().contains("pemasukkan")
+
+            if (isPemasukan) {
                 totalIncome += amount
             } else {
                 totalExpense += amount
@@ -149,7 +161,8 @@ class FinanceFragment : Fragment() {
         val format = NumberFormat.getCurrencyInstance(Locale("id", "ID"))
         format.maximumFractionDigits = 0
 
-        binding.tvTotalBalance.text = format.format(totalBalance).replace("Rp", "Rp ")
+        val formattedBalance = format.format(totalBalance).replace("Rp", "Rp ")
+        binding.tvTotalBalance.text = if (totalBalance >= 0) formattedBalance else formattedBalance.replace("Rp -", "-Rp ")
         binding.tvTotalIncome.text = format.format(totalIncome).replace("Rp", "Rp ")
         binding.tvTotalExpense.text = format.format(totalExpense).replace("Rp", "Rp ")
     }

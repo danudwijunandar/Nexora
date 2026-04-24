@@ -17,7 +17,7 @@ class WeeklyChartView @JvmOverloads constructor(
     private val linePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = bluePrimary
         style = Paint.Style.STROKE
-        strokeWidth = 8f
+        strokeWidth = 6f
         strokeCap = Paint.Cap.ROUND
         strokeJoin = Paint.Join.ROUND
     }
@@ -44,11 +44,10 @@ class WeeklyChartView @JvmOverloads constructor(
     private val path = Path()
     private val fillPath = Path()
     private var points = emptyList<PointF>()
-    private var dataValues = listOf(1f, 1f, 1f, 1f, 1f, 1f, 1f)
+    private var dataValues = listOf(0.95f, 0.95f, 0.95f, 0.95f, 0.95f, 0.95f, 0.95f)
     private var selectedDayIndex = -1
 
     init {
-        // Use current day as default selected day
         val cal = Calendar.getInstance()
         var day = cal.get(Calendar.DAY_OF_WEEK) - 2
         if (day < 0) day = 6
@@ -56,7 +55,7 @@ class WeeklyChartView @JvmOverloads constructor(
     }
 
     fun setData(values: List<Float>) {
-        if (values.size >= 2) {
+        if (values.size == 7) {
             dataValues = values
             invalidate()
         }
@@ -78,9 +77,9 @@ class WeeklyChartView @JvmOverloads constructor(
         val w = width.toFloat()
         val h = height.toFloat()
         
-        val stepX = w / (dataValues.size - 1)
+        val stepX = w / 7f
         points = dataValues.mapIndexed { index, value ->
-            PointF(index * stepX, h * value)
+            PointF((index + 0.5f) * stepX, h * value)
         }
 
         updatePaths(w, h)
@@ -91,27 +90,23 @@ class WeeklyChartView @JvmOverloads constructor(
         if (points.isEmpty()) return
         path.reset()
         
-        // Start from first point
         path.moveTo(points[0].x, points[0].y)
         
-        // Use cubic segments for smooth hill effect
         for (i in 0 until points.size - 1) {
             val p1 = points[i]
             val p2 = points[i + 1]
             val midX = (p1.x + p2.x) / 2
-            // Two control points at the same X-midpoint but different Ys to smooth the transition
             path.cubicTo(midX, p1.y, midX, p2.y, p2.x, p2.y)
         }
 
         fillPath.set(path)
-        fillPath.lineTo(w, h)
-        fillPath.lineTo(0f, h)
+        fillPath.lineTo(points.last().x, h)
+        fillPath.lineTo(points.first().x, h)
         fillPath.close()
     }
 
     private fun updateGradient(h: Float) {
-        // Adjust start color to be more visible but still soft
-        val startColor = Color.argb(100, Color.red(bluePrimary), Color.green(bluePrimary), Color.blue(bluePrimary))
+        val startColor = Color.argb(60, Color.red(bluePrimary), Color.green(bluePrimary), Color.blue(bluePrimary))
         fillPaint.shader = LinearGradient(
             0f, 0f, 0f, h,
             startColor,
@@ -137,11 +132,8 @@ class WeeklyChartView @JvmOverloads constructor(
         val h = height.toFloat()
         val p = points[selectedDayIndex]
         
-        // Vertical indicator line
         canvas.drawLine(p.x, p.y, p.x, h, indicatorPaint)
-        // Outer white circle
-        canvas.drawCircle(p.x, p.y, 15f, pointOutlinePaint)
-        // Inner blue circle
-        canvas.drawCircle(p.x, p.y, 10f, pointPaint)
+        canvas.drawCircle(p.x, p.y, 12f, pointOutlinePaint)
+        canvas.drawCircle(p.x, p.y, 8f, pointPaint)
     }
 }

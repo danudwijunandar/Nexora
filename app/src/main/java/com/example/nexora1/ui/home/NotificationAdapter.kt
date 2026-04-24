@@ -10,7 +10,7 @@ import com.example.nexora1.databinding.ItemNotificationBinding
 import java.text.SimpleDateFormat
 import java.util.*
 
-class NotificationAdapter : ListAdapter<NotificationEntity, NotificationAdapter.NotificationViewHolder>(DiffCallback) {
+class NotificationAdapter(private val onItemClick: (NotificationEntity) -> Unit) : ListAdapter<NotificationEntity, NotificationAdapter.NotificationViewHolder>(DiffCallback) {
 
     inner class NotificationViewHolder(private val binding: ItemNotificationBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(notification: NotificationEntity) {
@@ -18,6 +18,10 @@ class NotificationAdapter : ListAdapter<NotificationEntity, NotificationAdapter.
             binding.tvMessage.text = notification.message
             val sdf = SimpleDateFormat("dd MMM, HH:mm", Locale.getDefault())
             binding.tvTime.text = sdf.format(Date(notification.timestamp))
+            
+            binding.root.setOnClickListener {
+                onItemClick(notification)
+            }
         }
     }
 

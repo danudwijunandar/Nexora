@@ -21,6 +21,7 @@ import com.bumptech.glide.Glide
 import com.example.nexora1.R
 import com.example.nexora1.data.Result
 import com.example.nexora1.data.local.prefs.SessionManager
+import com.example.nexora1.data.local.room.UserEntity
 import com.example.nexora1.databinding.DialogUpdatePasswordBinding
 import com.example.nexora1.databinding.DialogUpdateUserBinding
 import com.example.nexora1.databinding.FragmentProfileBinding
@@ -38,6 +39,7 @@ class ProfileFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var sessionManager: SessionManager
     private var currentPhotoPath: String? = null
+    private var currentUser: UserEntity? = null
 
     private val viewModel: ProfileViewModel by viewModels {
         ViewModelFactory.getInstance(requireContext())
@@ -69,30 +71,57 @@ class ProfileFragment : Fragment() {
 
         observeViewModel()
 
-        binding.ivAvatar.setOnClickListener { showImagePickerOptions() }
+        binding.ivAvatar.setOnClickListener {
+            showEnlargedImage()
+        }
+
+        binding.layoutEnlargeImage.setOnClickListener {
+            binding.layoutEnlargeImage.visibility = View.GONE
+        }
+
+        binding.btnChangeAvatar.setOnClickListener {
+            showImagePickerOptions()
+            binding.layoutEnlargeImage.visibility = View.GONE
+        }
+
         binding.btnUpdateUser.setOnClickListener { showUpdateUserDialog() }
         binding.btnUpdatePassword.setOnClickListener { showUpdatePasswordDialog() }
         binding.btnLogout.setOnClickListener { showLogoutConfirmation() }
     }
 
+    private fun showEnlargedImage() {
+        binding.layoutEnlargeImage.visibility = View.VISIBLE
+        currentUser?.profileImagePath?.let {
+            Glide.with(this)
+                .load(it)
+                .placeholder(R.drawable.ic_user_placeholder)
+                .into(binding.ivEnlarged)
+        } ?: run {
+            binding.ivEnlarged.setImageResource(R.drawable.ic_user_placeholder)
+        }
+    }
+
     private fun observeViewModel() {
         val email = sessionManager.getEmail() ?: ""
         viewModel.getUserProfile(email).observe(viewLifecycleOwner) { user ->
+            currentUser = user
             binding.tvUsername.text = user?.username ?: sessionManager.getUsername()
             binding.tvemail.text = user?.email ?: sessionManager.getEmail()
             
-            user?.profileImagePath?.let {
+            if (!user?.profileImagePath.isNullOrEmpty()) {
                 Glide.with(this@ProfileFragment)
-                    .load(it)
-                    .placeholder(R.drawable.ic_logo)
+                    .load(user?.profileImagePath)
+                    .placeholder(R.drawable.ic_user_placeholder)
                     .circleCrop()
                     .into(binding.ivAvatar)
+            } else {
+                binding.ivAvatar.setImageResource(R.drawable.ic_user_placeholder)
             }
         }
 
         viewModel.updateResult.observe(viewLifecycleOwner) { result ->
             when (result) {
-                is Result.Loading -> { /* Show loading */ }
+                is Result.Loading -> {  }
                 is Result.Success -> {
                     Toast.makeText(requireContext(), "Berhasil diperbarui", Toast.LENGTH_SHORT).show()
                 }
@@ -123,7 +152,6 @@ class ProfileFragment : Fragment() {
             }
 
             viewModel.updateUser(token, username, email)
-            // Update session manager as well if success logic is handled or just assume success updates local too
             sessionManager.saveSession(token, username, email)
             dialog.dismiss()
         }

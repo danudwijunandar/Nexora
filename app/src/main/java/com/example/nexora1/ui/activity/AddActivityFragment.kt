@@ -3,12 +3,12 @@ package com.example.nexora1.ui.activity
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -52,7 +52,8 @@ class AddActivityFragment : Fragment() {
             activityId = it.getInt("activityId", -1)
             
             if (activityId != -1) {
-                binding.tvTitle.text = "Edit Aktivitas"
+                binding.tvTitle.text = getString(R.string.edit_activity_title)
+                binding.btnSave.text = getString(R.string.edit_activity_button)
                 binding.btnDelete.visibility = View.VISIBLE
                 binding.layoutEditStatus.visibility = View.VISIBLE
                 
@@ -66,18 +67,13 @@ class AddActivityFragment : Fragment() {
                     binding.spinnerKategori.setSelection(position)
                 }
 
-                binding.tilTitleActivity.isEnabled = false
-                binding.tilDescription.isEnabled = false
-                binding.spinnerKategori.isEnabled = false
-                binding.btnPickDate.isEnabled = false
-                binding.btnPickTime.isEnabled = false
                 binding.btnTemplate.visibility = View.GONE
 
                 val status = it.getString("status")
-                when (status) {
-                    "3", "selesai" -> binding.chipDone.isChecked = true
-                    "2", "sedang dikerjakan" -> binding.chipWorking.isChecked = true
-                    else -> binding.chipPending.isChecked = true
+                if (status == "3" || status == "selesai") {
+                    binding.chipDone.isChecked = true
+                } else {
+                    binding.chipPending.isChecked = true
                 }
             } else {
                 it.getString("title")?.let { title -> binding.tilTitleActivity.editText?.setText(title) }
@@ -85,24 +81,6 @@ class AddActivityFragment : Fragment() {
                     val adapter = binding.spinnerKategori.adapter as ArrayAdapter<String>
                     val position = adapter.getPosition(category)
                     binding.spinnerKategori.setSelection(position)
-                }
-                
-                it.getString("selectedDate")?.let { dateStr ->
-                    val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-                    try {
-                        val date = sdf.parse(dateStr)
-                        if (date != null) {
-                            val time = calendar.time
-                            calendar.time = date
-                            val calTime = Calendar.getInstance()
-                            calTime.time = time
-                            calendar.set(Calendar.HOUR_OF_DAY, calTime.get(Calendar.HOUR_OF_DAY))
-                            calendar.set(Calendar.MINUTE, calTime.get(Calendar.MINUTE))
-                            updateReminderLabel()
-                        }
-                    } catch (e: Exception) {
-                        Log.e("AddActivityFragment", "Parse date error: ${e.message}")
-                    }
                 }
             }
         }
@@ -112,36 +90,72 @@ class AddActivityFragment : Fragment() {
         binding.btnTemplate.setOnClickListener { findNavController().navigate(R.id.templateActivityFragment) }
         binding.btnBack.setOnClickListener { findNavController().navigateUp() }
         binding.btnSave.setOnClickListener { saveActivity() }
-        // Note: For full structured code, delete should also be in ViewModel.
+        binding.btnDelete.setOnClickListener { showDeleteConfirmation() }
+    }
+
+    private fun showDeleteConfirmation() {
+        AlertDialog.Builder(requireContext())
+            .setTitle(getString(R.string.delete_activity_dialog_title))
+            .setMessage(getString(R.string.delete_activity_dialog_message))
+            .setPositiveButton(getString(R.string.yes)) { _, _ ->
+                val token = sessionManager.getToken() ?: ""
+                viewModel.deleteActivity(token, activityId)
+            }
+            .setNegativeButton(getString(R.string.no), null)
+            .show()
     }
 
     private fun observeViewModel() {
-        viewModel.addActivityResult.observe(viewLifecycleOwner) { result ->
-            when (result) {
-                is Result.Loading -> {
-                    binding.btnSave.isEnabled = false
-                }
-                is Result.Success -> {
-                    Toast.makeText(context, "Berhasil menyimpan aktivitas", Toast.LENGTH_SHORT).show()
-                    // Schedule notification if needed (Simplified: logic usually inside VM or Repository)
-                    findNavController().navigateUp()
-                }
-                is Result.Error -> {
-                    binding.btnSave.isEnabled = true
-                    Toast.makeText(context, result.error, Toast.LENGTH_SHORT).show()
+        viewModel.addActivityResult.observe(viewLifecycleOwner) { event ->
+            event.getContentIfNotHandled()?.let { result ->
+                when (result) {
+                    is Result.Loading -> binding.btnSave.isEnabled = false
+                    is Result.Success -> {
+                        val delay = calendar.timeInMillis - System.currentTimeMillis()
+                        if (delay > 0) {
+                            NotificationHelper.scheduleActivityReminder(
+                                requireContext(), 
+                                result.data.id, 
+                                result.data.title, 
+                                delay
+                            )
+                        }
+                        Toast.makeText(context, getString(R.string.activity_saved_success), Toast.LENGTH_SHORT).show()
+                        findNavController().navigateUp()
+                    }
+                    is Result.Error -> {
+                        binding.btnSave.isEnabled = true
+                        Toast.makeText(context, result.error, Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
         }
         
-        viewModel.updateStatusResult.observe(viewLifecycleOwner) { result ->
-            when (result) {
-                is Result.Loading -> {}
-                is Result.Success -> {
-                    Toast.makeText(context, "Status berhasil diperbarui", Toast.LENGTH_SHORT).show()
-                    findNavController().navigateUp()
+        viewModel.updateStatusResult.observe(viewLifecycleOwner) { event ->
+            event.getContentIfNotHandled()?.let { result ->
+                when (result) {
+                    is Result.Loading -> {}
+                    is Result.Success -> {
+                        Toast.makeText(context, getString(R.string.activity_updated_success), Toast.LENGTH_SHORT).show()
+                        findNavController().navigateUp()
+                    }
+                    is Result.Error -> Toast.makeText(context, result.error, Toast.LENGTH_SHORT).show()
                 }
-                is Result.Error -> {
-                    Toast.makeText(context, result.error, Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        viewModel.deleteActivityResult.observe(viewLifecycleOwner) { event ->
+            event.getContentIfNotHandled()?.let { result ->
+                when (result) {
+                    is Result.Loading -> binding.btnDelete.isEnabled = false
+                    is Result.Success -> {
+                        Toast.makeText(context, getString(R.string.activity_deleted_success), Toast.LENGTH_SHORT).show()
+                        findNavController().navigateUp()
+                    }
+                    is Result.Error -> {
+                        binding.btnDelete.isEnabled = true
+                        Toast.makeText(context, result.error, Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
         }
@@ -166,11 +180,11 @@ class AddActivityFragment : Fragment() {
 
     private fun updateReminderLabel() {
         val format = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault())
-        binding.tvReminderInfo.text = "Pengingat: ${format.format(calendar.time)}"
+        binding.tvReminderInfo.text = getString(R.string.reminder_label, format.format(calendar.time))
     }
 
     private fun setupSpinner() {
-        val categories = arrayOf("produktif","kesehatan")
+        val categories = arrayOf("Produktif", "Kesehatan")
         val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, categories)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.spinnerKategori.adapter = adapter
@@ -183,21 +197,18 @@ class AddActivityFragment : Fragment() {
         val token = sessionManager.getToken() ?: ""
 
         if (title.isEmpty()) {
-            Toast.makeText(context, "Harap isi judul aktivitas", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, getString(R.string.title_empty_error), Toast.LENGTH_SHORT).show()
             return
         }
 
         if (activityId == -1) {
-            val sdfDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-            val dateStr = sdfDate.format(calendar.time)
-            viewModel.addActivity(token, title, description, category, dateStr)
+            val sdfFull = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+            val dateTimeStr = sdfFull.format(calendar.time)
+            
+            viewModel.addActivity(token, title, description, category, dateTimeStr)
         } else {
             val selectedChipId = binding.cgStatus.checkedChipId
-            val status = when (selectedChipId) {
-                R.id.chipDone -> "3"
-                R.id.chipWorking -> "2"
-                else -> "1"
-            }
+            val status = if (selectedChipId == R.id.chipDone) "3" else "1"
             viewModel.updateActivityStatus(token, activityId, title, status)
         }
     }

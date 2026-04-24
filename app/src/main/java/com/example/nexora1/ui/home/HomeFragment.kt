@@ -11,20 +11,24 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
 import com.example.nexora1.R
 import com.example.nexora1.data.Result
 import com.example.nexora1.data.local.prefs.SessionManager
+import com.example.nexora1.data.local.room.UserEntity
 import com.example.nexora1.data.remote.response.ActivityData
 import com.example.nexora1.databinding.FragmentHomeBinding
 import com.example.nexora1.ui.ViewModelFactory
 import com.example.nexora1.ui.activity.ActivityAdapter
 import com.example.nexora1.ui.activity.ActivityViewModel
 import com.example.nexora1.ui.auth.AuthActivity
+import com.example.nexora1.ui.profile.ProfileViewModel
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -35,8 +39,13 @@ class HomeFragment : Fragment() {
     private lateinit var adapter: ActivityAdapter
     private var selectedCalendar = Calendar.getInstance()
     private var fullList: List<ActivityData> = emptyList()
+    private var currentUser: UserEntity? = null
 
-    private val viewModel: ActivityViewModel by viewModels {
+    private val activityViewModel: ActivityViewModel by viewModels {
+        ViewModelFactory.getInstance(requireContext())
+    }
+
+    private val profileViewModel: ProfileViewModel by viewModels {
         ViewModelFactory.getInstance(requireContext())
     }
 
@@ -65,17 +74,43 @@ class HomeFragment : Fragment() {
         binding.ivNotification.setOnClickListener {
             findNavController().navigate(R.id.notificationFragment)
         }
+
+        binding.ivProfile.setOnClickListener {
+            showEnlargedImage()
+        }
+
+        binding.layoutEnlargeImage.setOnClickListener {
+            binding.layoutEnlargeImage.visibility = View.GONE
+        }
+
+        binding.btnInfoProfile.setOnClickListener {
+            binding.layoutEnlargeImage.visibility = View.GONE
+            findNavController().navigate(R.id.profileFragment)
+        }
         
         checkNotificationPermission()
         highlightSelectedDay()
         setupDayClickListeners()
+        setupTimeFilterListeners()
         observeViewModel()
         
         val token = sessionManager.getToken() ?: ""
         if (token.isNotEmpty()) {
-            viewModel.syncActivities(token)
+            activityViewModel.syncActivities(token)
         } else {
             handleUnauthorized()
+        }
+    }
+
+    private fun showEnlargedImage() {
+        binding.layoutEnlargeImage.visibility = View.VISIBLE
+        currentUser?.profileImagePath?.let {
+            Glide.with(this)
+                .load(it)
+                .placeholder(R.drawable.ic_user_placeholder)
+                .into(binding.ivEnlarged)
+        } ?: run {
+            binding.ivEnlarged.setImageResource(R.drawable.ic_user_placeholder)
         }
     }
 
@@ -95,8 +130,8 @@ class HomeFragment : Fragment() {
 
         val cal = Calendar.getInstance()
         cal.time = selectedCalendar.time
-        var dayIndex = cal.get(Calendar.DAY_OF_WEEK) - 2 // Mon=0
-        if (dayIndex < 0) dayIndex = 6 // Sun=6
+        var dayIndex = cal.get(Calendar.DAY_OF_WEEK) - 2
+        if (dayIndex < 0) dayIndex = 6
 
         daysViews.forEachIndexed { index, textView ->
             if (index == dayIndex) {
@@ -128,9 +163,16 @@ class HomeFragment : Fragment() {
                 cal.add(Calendar.DAY_OF_YEAR, index - currentDayIndex)
                 selectedCalendar = cal
                 
+                binding.chipToday.isChecked = true
                 highlightSelectedDay()
                 applyFilters()
             }
+        }
+    }
+
+    private fun setupTimeFilterListeners() {
+        binding.cgTimeFilter.setOnCheckedChangeListener { _, _ ->
+            applyFilters()
         }
     }
 
@@ -148,46 +190,139 @@ class HomeFragment : Fragment() {
                 findNavController().navigate(R.id.addActivityFragment, bundle)
             },
             onStatusChange = { activity, isChecked ->
-                val token = sessionManager.getToken() ?: ""
-                val status = if (isChecked) "3" else "1"
-                viewModel.updateActivityStatus(token, activity.id, activity.title, status)
+                showStatusConfirmation(activity, isChecked)
             }
         )
         binding.rvTodayTask.layoutManager = LinearLayoutManager(context)
         binding.rvTodayTask.adapter = adapter
     }
 
+    private fun showStatusConfirmation(activity: ActivityData, isChecked: Boolean) {
+        if (isChecked) {
+            AlertDialog.Builder(requireContext())
+                .setTitle("Konfirmasi")
+                .setMessage("Apakah anda sudah menyelesaikan aktivitas ini?")
+                .setPositiveButton("Ya") { _, _ ->
+                    updateStatus(activity, true)
+                }
+                .setNegativeButton("Tidak") { _, _ ->
+                    activityViewModel.syncActivities(sessionManager.getToken() ?: "")
+                }
+                .setOnCancelListener {
+                    activityViewModel.syncActivities(sessionManager.getToken() ?: "")
+                }
+                .show()
+        } else {
+            updateStatus(activity, false)
+        }
+    }
+
+    private fun updateStatus(activity: ActivityData, isDone: Boolean) {
+        val token = sessionManager.getToken() ?: ""
+        val status = if (isDone) "3" else "1"
+        activityViewModel.updateActivityStatus(token, activity.id, activity.title, status)
+    }
+
     private fun observeViewModel() {
-        viewModel.getActivities().observe(viewLifecycleOwner) { activities ->
+        activityViewModel.getActivities().observe(viewLifecycleOwner) { activities ->
             fullList = activities
             applyFilters()
         }
 
-        viewModel.updateStatusResult.observe(viewLifecycleOwner) { result ->
-            if (result is Result.Success) {
-                Toast.makeText(requireContext(), "Aktivitas '${result.data}' diperbarui", Toast.LENGTH_SHORT).show()
-            } else if (result is Result.Error) {
-                Toast.makeText(requireContext(), result.error, Toast.LENGTH_SHORT).show()
+        activityViewModel.updateStatusResult.observe(viewLifecycleOwner) { event ->
+            event.getContentIfNotHandled()?.let { result ->
+                if (result is Result.Success) {
+                    Toast.makeText(requireContext(), "Aktivitas '${result.data}' diperbarui", Toast.LENGTH_SHORT).show()
+                } else if (result is Result.Error) {
+                    Toast.makeText(requireContext(), result.error, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+
+        val email = sessionManager.getEmail() ?: ""
+        profileViewModel.getUserProfile(email).observe(viewLifecycleOwner) { user ->
+            currentUser = user
+            if (user != null) {
+                binding.tvGreeting.text = "Halo, ${user.username}!"
+                if (!user.profileImagePath.isNullOrEmpty()) {
+                    Glide.with(this@HomeFragment)
+                        .load(user.profileImagePath)
+                        .placeholder(R.drawable.ic_user_placeholder)
+                        .circleCrop()
+                        .into(binding.ivProfile)
+                } else {
+                    binding.ivProfile.setImageResource(R.drawable.ic_user_placeholder)
+                }
             }
         }
     }
 
     private fun applyFilters() {
         updateWeeklyChart(fullList)
-
-        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        val selectedDateStr = sdf.format(selectedCalendar.time)
-        val displayActivities = fullList.filter { it.createdAt.startsWith(selectedDateStr) }
         
-        val completed = displayActivities.count { it.status == "selesai" || it.status == "3" }
-        val percent = if (displayActivities.isNotEmpty()) (completed * 100) / displayActivities.size else 0
+        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val filteredList: List<ActivityData>
 
-        binding.tvNumberActivity.text = displayActivities.size.toString()
+        when (binding.cgTimeFilter.checkedChipId) {
+            R.id.chipWeek -> {
+                binding.tvListTitle.text = getString(R.string.this_week)
+                val cal = Calendar.getInstance()
+                val currentDayOfWeek = cal.get(Calendar.DAY_OF_WEEK)
+                val daysToSubtract = if (currentDayOfWeek == Calendar.SUNDAY) 6 else currentDayOfWeek - Calendar.MONDAY
+                cal.add(Calendar.DAY_OF_YEAR, -daysToSubtract)
+                cal.set(Calendar.HOUR_OF_DAY, 0)
+                cal.set(Calendar.MINUTE, 0)
+                val startOfWeek = cal.timeInMillis
+                cal.add(Calendar.DAY_OF_YEAR, 7)
+                val endOfWeek = cal.timeInMillis
+
+                filteredList = fullList.filter {
+                    try {
+                        val dateSource = it.date ?: it.createdAt
+                        val actDate = sdf.parse(dateSource.take(10))
+                        actDate != null && actDate.time >= startOfWeek && actDate.time < endOfWeek
+                    } catch (e: Exception) { false }
+                }.sortedWith(compareBy<ActivityData> { 
+                    if (it.status == "selesai" || it.status == "3") 1 else 0
+                }.thenByDescending { it.date ?: it.createdAt })
+            }
+            R.id.chipMonth -> {
+                binding.tvListTitle.text = getString(R.string.this_mounth)
+                val currentMonth = Calendar.getInstance().get(Calendar.MONTH)
+                val currentYear = Calendar.getInstance().get(Calendar.YEAR)
+                filteredList = fullList.filter {
+                    try {
+                        val dateSource = it.date ?: it.createdAt
+                        val actDate = sdf.parse(dateSource.take(10))
+                        val calAct = Calendar.getInstance()
+                        if (actDate != null) calAct.time = actDate
+                        actDate != null && calAct.get(Calendar.MONTH) == currentMonth && calAct.get(Calendar.YEAR) == currentYear
+                    } catch (e: Exception) { false }
+                }.sortedWith(compareBy<ActivityData> { 
+                    if (it.status == "selesai" || it.status == "3") 1 else 0
+                }.thenByDescending { it.date ?: it.createdAt })
+            }
+            else -> {
+                binding.tvListTitle.text = getString(R.string.today)
+                val selectedDateStr = sdf.format(selectedCalendar.time)
+                filteredList = fullList.filter { 
+                    val dateSource = it.date ?: it.createdAt
+                    dateSource.startsWith(selectedDateStr) 
+                }.sortedWith(compareBy<ActivityData> { 
+                    if (it.status == "selesai" || it.status == "3") 1 else 0
+                }.thenByDescending { it.date ?: it.createdAt })
+            }
+        }
+
+        val completed = filteredList.count { it.status == "selesai" || it.status == "3" }
+        val percent = if (filteredList.isNotEmpty()) (completed * 100) / filteredList.size else 0
+
+        binding.tvNumberActivity.text = filteredList.size.toString()
         binding.tvPercent.text = "$percent%"
         binding.pbActivity.progress = percent
         binding.pbProductivity.progress = percent
 
-        adapter.submitList(displayActivities)
+        adapter.submitList(filteredList)
     }
 
     private fun updateWeeklyChart(activities: List<ActivityData>) {
@@ -209,7 +344,8 @@ class HomeFragment : Fragment() {
         
         activities.forEach { activity ->
             try {
-                val dateStr = activity.createdAt.take(10)
+                val dateSource = activity.date ?: activity.createdAt
+                val dateStr = dateSource.take(10)
                 val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
                 val actDate = sdf.parse(dateStr)
                 if (actDate != null) {

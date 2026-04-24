@@ -11,6 +11,8 @@ import androidx.core.app.NotificationCompat
 import com.example.nexora1.MainActivity
 import com.example.nexora1.R
 import com.example.nexora1.data.local.prefs.SessionManager
+import com.example.nexora1.data.local.room.NexoraDatabase
+import com.example.nexora1.data.local.room.NotificationEntity
 import com.example.nexora1.data.remote.retrofit.ApiConfig
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -27,10 +29,21 @@ class NotificationReceiver : BroadcastReceiver() {
                 val response = ApiConfig.getApiService().getActivities("Bearer $token")
                 if (response.isSuccessful) {
                     val activities = response.body()?.data ?: emptyList()
-                    val unfinishedCount = activities.count { it.status != "selesai" && it.status != "1" }
+                    val unfinishedActivity = activities.find { it.status != "selesai" && it.status != "3" }
                     
-                    if (unfinishedCount > 0) {
-                        showNotification(context, unfinishedCount)
+                    if (unfinishedActivity != null) {
+                        val activityName = unfinishedActivity.title
+                        val message = "Kamu belum menyelesaikan aktivitas $activityName. Yuk selesaikan!"
+
+                        val database = NexoraDatabase.getInstance(context)
+                        database.notificationDao().insertNotification(
+                            NotificationEntity(
+                                title = "Pengingat Aktivitas",
+                                message = message
+                            )
+                        )
+                        
+                        showNotification(context, message)
                     }
                 }
             } catch (e: Exception) {
@@ -39,9 +52,9 @@ class NotificationReceiver : BroadcastReceiver() {
         }
     }
 
-    private fun showNotification(context: Context, count: Int) {
+    private fun showNotification(context: Context, message: String) {
         val channelId = "activity_reminder_channel"
-        val notificationId = 101
+        val notificationId = System.currentTimeMillis().toInt()
 
         val intent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -65,10 +78,11 @@ class NotificationReceiver : BroadcastReceiver() {
         val notification = NotificationCompat.Builder(context, channelId)
             .setSmallIcon(R.drawable.ic_logo)
             .setContentTitle("Pengingat Aktivitas")
-            .setContentText("Kamu memiliki $count aktivitas yang belum selesai. Yuk selesaikan!")
+            .setContentText(message)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(message))
             .build()
 
         notificationManager.notify(notificationId, notification)

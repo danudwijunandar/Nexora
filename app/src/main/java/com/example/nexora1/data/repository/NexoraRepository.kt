@@ -19,8 +19,6 @@ class NexoraRepository(
     private val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
     private val sdfDateOnly = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
 
-    // --- Auth ---
-
     suspend fun login(email: String, pass: String): Result<LoginResponse> {
         return try {
             val response = apiService.login(email, pass)
@@ -61,15 +59,18 @@ class NexoraRepository(
         }
     }
 
-    // --- User ---
-
     fun getUserProfile(email: String): Flow<UserEntity?> = userDao.getUserProfile(email)
 
     suspend fun updateUser(token: String, username: String, email: String): Boolean {
         return try {
             val response = apiService.updateUser("Bearer $token", username, email)
             if (response.isSuccessful) {
-                userDao.insertOrUpdate(UserEntity(email = email, username = username))
+                val currentLocal = userDao.getUserProfileOnce(email)
+                userDao.insertOrUpdate(UserEntity(
+                    email = email,
+                    username = username,
+                    profileImagePath = currentLocal?.profileImagePath
+                ))
                 true
             } else false
         } catch (e: Exception) {
@@ -90,8 +91,6 @@ class NexoraRepository(
         userDao.insertOrUpdate(UserEntity(email = email, username = username, profileImagePath = path))
     }
 
-    // --- Activity ---
-
     fun getLocalActivities(): Flow<List<ActivityData>> {
         return activityDao.getAllActivities().map { entities ->
             entities.map { entity ->
@@ -103,6 +102,7 @@ class NexoraRepository(
                     status = entity.status,
                     categories = entity.categories,
                     moodRating = entity.moodRating,
+                    date = entity.userSelectedDate,
                     createdAt = entity.createdAt,
                     updatedAt = entity.updatedAt
                 )
@@ -110,30 +110,30 @@ class NexoraRepository(
         }
     }
 
-    suspend fun addActivity(token: String, title: String, description: String, category: String, date: String? = null): Boolean {
-        val now = sdf.format(Date())
-        val selectedDate = date ?: sdfDateOnly.format(Date())
-        
-        val entity = ActivityEntity(
-            userId = 0,
-            title = title,
-            description = description,
-            status = "belum selesai",
-            categories = category,
-            isSynced = false,
-            createdAt = selectedDate,
-            updatedAt = now
-        )
-        activityDao.insertActivity(entity)
-        
+    suspend fun addActivityWithReturn(token: String, title: String, description: String, category: String, date: String? = null): ActivityData? {
+        val inputDate = date ?: sdf.format(Date())
         return try {
-            val response = apiService.createActivity("Bearer $token", title, description, category, selectedDate)
-            if (response.isSuccessful) {
-                syncActivities(token)
-                true
-            } else false
+            val response = apiService.createActivity("Bearer $token", title, description, category, inputDate)
+            if (response.isSuccessful && response.body() != null) {
+                val data = response.body()!!.data
+                val entity = ActivityEntity(
+                    id = data.id,
+                    userId = data.userId,
+                    title = data.title,
+                    description = data.description,
+                    status = data.status,
+                    categories = data.categories,
+                    moodRating = data.moodRating,
+                    userSelectedDate = inputDate,
+                    createdAt = data.createdAt,
+                    updatedAt = data.updatedAt,
+                    isSynced = true
+                )
+                activityDao.insertActivity(entity)
+                data.copy(date = inputDate)
+            } else null
         } catch (e: Exception) {
-            false
+            null
         }
     }
 
@@ -166,7 +166,9 @@ class NexoraRepository(
             val response = apiService.getActivities("Bearer $token")
             if (response.isSuccessful) {
                 val activities = response.body()?.data ?: emptyList()
+                val currentLocal = activityDao.getAllActivitiesOnce() 
                 val entities = activities.map { data ->
+                    val localMatch = currentLocal.find { it.id == data.id }
                     ActivityEntity(
                         id = data.id,
                         userId = data.userId,
@@ -175,6 +177,7 @@ class NexoraRepository(
                         status = data.status,
                         categories = data.categories,
                         moodRating = data.moodRating,
+                        userSelectedDate = localMatch?.userSelectedDate,
                         createdAt = data.createdAt,
                         updatedAt = data.updatedAt,
                         isSynced = true
@@ -185,8 +188,6 @@ class NexoraRepository(
             }
         } catch (e: Exception) {}
     }
-
-    // --- Finance ---
 
     fun getLocalFinance(): Flow<List<FinanceEntity>> = financeDao.getAllFinance()
 

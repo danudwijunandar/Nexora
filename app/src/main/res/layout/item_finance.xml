@@ -2,9 +2,10 @@
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mainCard"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="16dp"
+    android:layout_marginHorizontal="2dp"
     android:layout_marginVertical="8dp"
     app:cardBackgroundColor="@color/white"
     app:cardCornerRadius="16dp"
@@ -17,7 +18,7 @@
         android:padding="16dp">
 
         <TextView
-            android:id="@+id/tvNote"
+            android:id="@+id/tvCategory"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:ellipsize="end"
@@ -26,22 +27,36 @@
             android:textColor="@color/black"
             android:textSize="16sp"
             android:textStyle="bold"
-            app:layout_constraintEnd_toStartOf="@+id/tvCategory"
+            app:layout_constraintEnd_toStartOf="@+id/tvType"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/tvCategory"
+            android:id="@+id/tvType"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/bg_tag_gray"
             android:paddingHorizontal="12dp"
             android:paddingVertical="4dp"
-            android:text="Makanan"
+            android:text="Pengeluaran"
             android:textColor="@color/text_gray"
             android:textSize="12sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tvNote"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="Makanan"
+            android:textColor="@color/text_gray"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toStartOf="@+id/llAmount"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvCategory" />
 
         <TextView
             android:id="@+id/tvDate"
@@ -55,18 +70,19 @@
             app:layout_constraintTop_toBottomOf="@+id/tvNote" />
 
         <LinearLayout
+            android:id="@+id/llAmount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvCategory">
+            app:layout_constraintTop_toBottomOf="@+id/tvType">
 
             <ImageView
                 android:id="@+id/ivFinanceType"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
                 android:src="@drawable/ic_expense" />
 
             <TextView
@@ -81,4 +97,5 @@
         </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 </com.google.android.material.card.MaterialCardView>
