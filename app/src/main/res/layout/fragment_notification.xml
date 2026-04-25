@@ -23,7 +23,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Notifikasi"
+            android:text="@string/notification"
             android:textColor="@color/black"
             android:textSize="18sp"
             android:textStyle="bold"
@@ -48,7 +48,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="Belum ada notifikasi"
+            android:text="@string/notification_not_yet"
             android:textColor="@color/text_gray"
             android:textSize="16sp" />
     </FrameLayout>

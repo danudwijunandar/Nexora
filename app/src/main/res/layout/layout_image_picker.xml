@@ -10,7 +10,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Pilih Sumber Gambar"
+        android:text="@string/select_image_source"
         android:textSize="18sp"
         android:textStyle="bold"
         android:textColor="@color/black"
@@ -36,7 +36,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Kamera"
+            android:text="@string/camera"
             android:textSize="16sp"
             android:layout_marginStart="16dp"
             android:textColor="@color/black"/>
@@ -62,7 +62,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Galeri"
+            android:text="@string/galery"
             android:textSize="16sp"
             android:layout_marginStart="16dp"
             android:textColor="@color/black"/>

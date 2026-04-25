@@ -9,7 +9,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Edit Profil"
+        android:text="@string/edit_profile"
         android:textSize="20sp"
         android:textStyle="bold"
         android:textColor="@color/black"
@@ -20,7 +20,7 @@
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Username"
+        android:hint="@string/hint_username"
         app:boxCornerRadiusTopStart="12dp"
         app:boxCornerRadiusTopEnd="12dp"
         app:boxCornerRadiusBottomStart="12dp"
@@ -39,7 +39,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
-        android:hint="Email"
+        android:hint="@string/hint_email"
         app:boxCornerRadiusTopStart="12dp"
         app:boxCornerRadiusTopEnd="12dp"
         app:boxCornerRadiusBottomStart="12dp"
@@ -57,7 +57,7 @@
         android:layout_width="match_parent"
         android:layout_height="52dp"
         android:layout_marginTop="24dp"
-        android:text="Simpan Perubahan"
+        android:text="@string/save_update"
         app:cornerRadius="12dp" />
 
 </LinearLayout>

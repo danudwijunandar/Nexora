@@ -17,7 +17,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Pilih Tipe Data"
+        android:text="@string/pick_type_data"
         android:textColor="@color/black"
         android:textSize="18sp"
         android:textStyle="bold"
@@ -49,7 +49,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Aktivitas"
+                android:text="@string/title_add"
                 android:textColor="@color/black"
                 android:textSize="16sp"
                 android:textStyle="bold" />
@@ -57,7 +57,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Tambahkan jadwal kegiatan harian"
+                android:text="@string/add_subtitle_activity"
                 android:textColor="@color/text_gray"
                 android:textSize="12sp" />
         </LinearLayout>
@@ -89,7 +89,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Keuangan"
+                android:text="@string/add_finance_title"
                 android:textColor="@color/black"
                 android:textSize="16sp"
                 android:textStyle="bold" />
@@ -97,7 +97,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Catat pemasukan atau pengeluaran"
+                android:text="@string/add_finance_subtitle"
                 android:textColor="@color/text_gray"
                 android:textSize="12sp" />
         </LinearLayout>

@@ -51,7 +51,7 @@
                 android:layout_marginTop="24dp"
                 android:layout_gravity="center"
                 android:textAlignment="center"
-                android:text="Halo, selamat\ndatang kembali"
+                android:text="@string/title_login"
                 android:textColor="@color/black"
                 android:textSize="28sp"
                 android:textStyle="bold" />

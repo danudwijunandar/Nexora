@@ -27,7 +27,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_weight="1"
-            android:text="Minum air putih, jaga kesehatan"
+            android:text="@string/subtile_activity"
             android:textColor="@color/black"
             android:textSize="14sp" />
 

@@ -12,7 +12,7 @@
     <string name="sign_up">Daftar Sekarang</string>
 
     <string name="register_title">Mulai perjalananmu bersama kami</string>
-    <string name="check_terms_condition">Saya setuju dengan Syarat Ketentuan Nexora</string>
+    <string name="check_terms_condition">Syarat Ketentuan Nexora</string>
     <string name="btn_register">Register</string>
     <string name="already_have_account">Sudah punya akun?</string>
     <string name="sign_in">Login Sekarang</string>
@@ -111,4 +111,35 @@
     <string name="date">Tanggal</string>
     <string name="finance_amount_format">%s Rp %s</string>
     <string name="healt">Kesehatan</string>
+    <string name="have_account">Sudah punya akun?</string>
+    <string name="login">Masuk</string>
+    <string name="title_register">Halo, mari \nbuat akun barumu</string>
+    <string name="title_login">Halo, selamat \ndatang di Nexora</string>
+    <string name="pick_type_data">Pilih Tipe Data</string>
+    <string name="add_subtitle_activity">Tambahkan jadwal kegiatan harian</string>
+    <string name="add_finance_subtitle">Catat pemasukan atau pengeluaran</string>
+    <string name="change_password">Ubah Password</string>
+    <string name="subtitle_change_password">Gunakan minimal satu angka untuk keamanan</string>
+    <string name="old_password">Password Lama</string>
+    <string name="new_password">Password Baru</string>
+    <string name="update_password">Perbarui Password</string>
+    <string name="edit_profile">Edit Profil</string>
+    <string name="save_update">Simpan Perubahan</string>
+    <string name="subtile_activity">Daftar Kegiatan</string>
+    <string name="remember">Pengingat</string>
+    <string name="choose_date">Pilih Tanggal</string>
+    <string name="choose_time">Pilih Jam</string>
+    <string name="no_remember_yet">Belum ada pengingat</string>
+    <string name="status_activity">Status Aktivitas</string>
+    <string name="not_done">Belum Dikerjakan</string>
+    <string name="done">Selesai</string>
+    <string name="insert_my_list">Tambahkan ke daftar saya</string>
+    <string name="notification_not_yet">Belum ada notifikasi</string>
+    <string name="others">Lainnya</string>
+    <string name="template_task">Templat Tugas</string>
+    <string name="subtitle_edit_password">Perbarui informasi akun Anda</string>
+    <string name="save_change">Simpan Perubahan</string>
+    <string name="select_image_source">Pilih Sumber Gambar</string>
+    <string name="camera">Kamera</string>
+    <string name="galery">Galeri</string>
 </resources>

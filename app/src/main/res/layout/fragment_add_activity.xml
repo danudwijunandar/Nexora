@@ -118,7 +118,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="Kategori"
+                android:text="@string/category"
                 android:textColor="@color/black"
                 android:textSize="14sp" />
 
@@ -150,7 +150,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="Pengingat"
+                android:text="@string/remember"
                 android:textColor="@color/black"
                 android:textSize="14sp"
                 android:textStyle="bold" />
@@ -168,7 +168,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
                     android:layout_weight="1"
-                    android:text="Pilih Tanggal"
+                    android:text="@string/choose_date"
                     app:cornerRadius="12dp" />
 
                 <com.google.android.material.button.MaterialButton
@@ -177,7 +177,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Pilih Jam"
+                    android:text="@string/choose_time"
                     app:cornerRadius="12dp" />
             </LinearLayout>
 
@@ -186,7 +186,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="Belum ada pengingat"
+                android:text="@string/no_remember_yet"
                 android:textColor="@color/text_gray"
                 android:textSize="12sp" />
 
@@ -201,7 +201,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:text="Status Aktivitas"
+                    android:text="@string/status_activity"
                     android:textColor="@color/black"
                     android:textSize="14sp" />
 
@@ -218,14 +218,14 @@
                         style="@style/Widget.MaterialComponents.Chip.Choice"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Belum Dikerjakan" />
+                        android:text="@string/not_done" />
 
                     <com.google.android.material.chip.Chip
                         android:id="@+id/chipDone"
                         style="@style/Widget.MaterialComponents.Chip.Choice"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Selesai" />
+                        android:text="@string/done" />
                 </com.google.android.material.chip.ChipGroup>
             </LinearLayout>
 
@@ -237,7 +237,7 @@
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:backgroundTint="@color/colorPrimary"
-        android:text="Tambahkan ke daftar saya"
+        android:text="@string/insert_my_list"
         android:textAllCaps="false"
         android:textSize="16sp"
         app:cornerRadius="28dp"

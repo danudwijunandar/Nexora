@@ -25,12 +25,7 @@ class NexoraRepository(
                 Result.Success(response.body()!!)
             } else {
                 val errorBody = response.errorBody()?.string()
-                val errorMsg = try {
-                    val errorJson = JSONObject(errorBody ?: "{}")
-                    errorJson.optString("message", "Login Gagal")
-                } catch (e: Exception) {
-                    "Login Gagal: ${response.code()}"
-                }
+                val errorMsg = parseErrorMessage(errorBody, "Login Gagal")
                 Result.Error(errorMsg)
             }
         } catch (e: Exception) {
@@ -45,16 +40,27 @@ class NexoraRepository(
                 Result.Success(response.body()!!)
             } else {
                 val errorBody = response.errorBody()?.string()
-                val errorMsg = try {
-                    val errorJson = JSONObject(errorBody ?: "{}")
-                    errorJson.optString("message", "Registrasi Gagal")
-                } catch (e: Exception) {
-                    "Registrasi Gagal: ${response.code()}"
-                }
+                val errorMsg = parseErrorMessage(errorBody, "Registrasi Gagal")
                 Result.Error(errorMsg)
             }
         } catch (e: Exception) {
             Result.Error(e.message ?: "Terjadi kesalahan koneksi")
+        }
+    }
+
+    private fun parseErrorMessage(errorBody: String?, defaultMsg: String): String {
+        return try {
+            val errorJson = JSONObject(errorBody ?: "{}")
+            // Coba ambil dari array errors[0].message jika ada
+            val errorsArray = errorJson.optJSONArray("errors")
+            if (errorsArray != null && errorsArray.length() > 0) {
+                errorsArray.getJSONObject(0).optString("message", defaultMsg)
+            } else {
+                // Fallback ke field message utama
+                errorJson.optString("message", defaultMsg)
+            }
+        } catch (e: Exception) {
+            defaultMsg
         }
     }
 
