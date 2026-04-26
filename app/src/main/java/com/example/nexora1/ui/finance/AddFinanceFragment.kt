@@ -95,13 +95,18 @@ class AddFinanceFragment : Fragment() {
             when (result) {
                 is Result.Loading -> {
                     binding.btnSave.isEnabled = false
+                    binding.progressBar.visibility = View.VISIBLE
+                    binding.btnSave.text = ""
                 }
                 is Result.Success -> {
+                    binding.progressBar.visibility = View.GONE
                     Toast.makeText(context, "Data berhasil diproses", Toast.LENGTH_SHORT).show()
                     findNavController().navigateUp()
                 }
                 is Result.Error -> {
                     binding.btnSave.isEnabled = true
+                    binding.progressBar.visibility = View.GONE
+                    binding.btnSave.text = "Simpan"
                     Toast.makeText(context, result.error, Toast.LENGTH_SHORT).show()
                 }
             }

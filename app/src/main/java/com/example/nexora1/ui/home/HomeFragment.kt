@@ -323,6 +323,7 @@ class HomeFragment : Fragment() {
         binding.pbProductivity.progress = percent
 
         adapter.submitList(filteredList)
+        binding.tvEmptyState.visibility = if (filteredList.isEmpty()) View.VISIBLE else View.GONE
     }
 
     private fun updateWeeklyChart(activities: List<ActivityData>) {
@@ -352,7 +353,7 @@ class HomeFragment : Fragment() {
                     val actTime = actDate.time
                     if (actTime >= startOfWeek && actTime < endOfWeek) {
                         val actCal = Calendar.getInstance()
-                        actCal.time = actDate
+                        actCal.time = dateSource.let { sdf.parse(it.take(10)) } ?: Date()
                         var idx = actCal.get(Calendar.DAY_OF_WEEK) - 2
                         if (idx < 0) idx = 6
                         if (idx in 0..6) {

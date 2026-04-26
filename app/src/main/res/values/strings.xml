@@ -142,4 +142,5 @@
     <string name="select_image_source">Pilih Sumber Gambar</string>
     <string name="camera">Kamera</string>
     <string name="galery">Galeri</string>
+    <string name="empty_finance">Belum ada aktivitas keuangan</string>
 </resources>

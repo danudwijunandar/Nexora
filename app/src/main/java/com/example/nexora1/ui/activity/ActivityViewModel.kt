@@ -22,13 +22,22 @@ class ActivityViewModel(private val repository: NexoraRepository) : ViewModel() 
     private val _deleteActivityResult = MutableLiveData<Event<Result<Boolean>>>()
     val deleteActivityResult: LiveData<Event<Result<Boolean>>> = _deleteActivityResult
 
+    private val _syncResult = MutableLiveData<Result<Unit>>()
+    val syncResult: LiveData<Result<Unit>> = _syncResult
+
     fun getActivities(): LiveData<List<ActivityData>> {
         return repository.getLocalActivities().asLiveData()
     }
 
     fun syncActivities(token: String) {
+        _syncResult.value = Result.Loading
         viewModelScope.launch {
-            repository.syncActivities(token)
+            try {
+                repository.syncActivities(token)
+                _syncResult.value = Result.Success(Unit)
+            } catch (e: Exception) {
+                _syncResult.value = Result.Error(e.message ?: "Terjadi kesalahan")
+            }
         }
     }
 

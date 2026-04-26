@@ -129,12 +129,31 @@ class ActivityFragment : Fragment() {
         })
         
         adapter.submitList(filteredList)
+        binding.tvEmptyState.visibility = if (filteredList.isEmpty() && binding.progressBar.visibility == View.GONE) View.VISIBLE else View.GONE
     }
 
     private fun observeViewModel() {
         viewModel.getActivities().observe(viewLifecycleOwner) { activities ->
             fullList = activities
             applyFilters()
+        }
+
+        viewModel.syncResult.observe(viewLifecycleOwner) { result ->
+            when (result) {
+                is Result.Loading -> {
+                    binding.progressBar.visibility = View.VISIBLE
+                    binding.tvEmptyState.visibility = View.GONE
+                }
+                is Result.Success -> {
+                    binding.progressBar.visibility = View.GONE
+                    applyFilters()
+                }
+                is Result.Error -> {
+                    binding.progressBar.visibility = View.GONE
+                    Toast.makeText(requireContext(), result.error, Toast.LENGTH_SHORT).show()
+                    applyFilters()
+                }
+            }
         }
 
         viewModel.updateStatusResult.observe(viewLifecycleOwner) { event ->

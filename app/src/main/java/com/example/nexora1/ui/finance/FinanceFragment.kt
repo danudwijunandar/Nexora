@@ -136,6 +136,7 @@ class FinanceFragment : Fragment() {
         }
 
         adapter.submitList(filteredList)
+        binding.tvEmptyState.visibility = if (filteredList.isEmpty()) View.VISIBLE else View.GONE
     }
 
     private fun updateSummary(list: List<FinanceData>) {

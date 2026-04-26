@@ -201,4 +201,17 @@
         app:layout_constraintTop_toBottomOf="@id/cgFilter"
         tools:listitem="@layout/item_finance" />
 
+    <TextView
+        android:id="@+id/tvEmptyState"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/empty_finance"
+        android:textColor="@color/text_gray"
+        android:textSize="16sp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/cgFilter" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

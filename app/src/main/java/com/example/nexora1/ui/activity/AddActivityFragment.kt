@@ -109,8 +109,13 @@ class AddActivityFragment : Fragment() {
         viewModel.addActivityResult.observe(viewLifecycleOwner) { event ->
             event.getContentIfNotHandled()?.let { result ->
                 when (result) {
-                    is Result.Loading -> binding.btnSave.isEnabled = false
+                    is Result.Loading -> {
+                        binding.btnSave.isEnabled = false
+                        binding.progressBar.visibility = View.VISIBLE
+                        binding.btnSave.text = ""
+                    }
                     is Result.Success -> {
+                        binding.progressBar.visibility = View.GONE
                         val delay = calendar.timeInMillis - System.currentTimeMillis()
                         if (delay > 0) {
                             NotificationHelper.scheduleActivityReminder(
@@ -125,6 +130,8 @@ class AddActivityFragment : Fragment() {
                     }
                     is Result.Error -> {
                         binding.btnSave.isEnabled = true
+                        binding.progressBar.visibility = View.GONE
+                        binding.btnSave.text = if (activityId == -1) getString(R.string.insert_my_list) else getString(R.string.edit_activity_button)
                         Toast.makeText(context, result.error, Toast.LENGTH_SHORT).show()
                     }
                 }
@@ -134,12 +141,22 @@ class AddActivityFragment : Fragment() {
         viewModel.updateStatusResult.observe(viewLifecycleOwner) { event ->
             event.getContentIfNotHandled()?.let { result ->
                 when (result) {
-                    is Result.Loading -> {}
+                    is Result.Loading -> {
+                        binding.btnSave.isEnabled = false
+                        binding.progressBar.visibility = View.VISIBLE
+                        binding.btnSave.text = ""
+                    }
                     is Result.Success -> {
+                        binding.progressBar.visibility = View.GONE
                         Toast.makeText(context, getString(R.string.activity_updated_success), Toast.LENGTH_SHORT).show()
                         findNavController().navigateUp()
                     }
-                    is Result.Error -> Toast.makeText(context, result.error, Toast.LENGTH_SHORT).show()
+                    is Result.Error -> {
+                        binding.btnSave.isEnabled = true
+                        binding.progressBar.visibility = View.GONE
+                        binding.btnSave.text = getString(R.string.edit_activity_button)
+                        Toast.makeText(context, result.error, Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
         }
@@ -174,6 +191,8 @@ class AddActivityFragment : Fragment() {
         TimePickerDialog(requireContext(), { _, hourOfDay, minute ->
             calendar.set(Calendar.HOUR_OF_DAY, hourOfDay)
             calendar.set(Calendar.MINUTE, minute)
+            calendar.set(Calendar.SECOND, 0)
+            calendar.set(Calendar.MILLISECOND, 0)
             updateReminderLabel()
         }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true).show()
     }
