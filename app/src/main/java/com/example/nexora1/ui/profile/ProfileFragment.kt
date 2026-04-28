@@ -94,10 +94,10 @@ class ProfileFragment : Fragment() {
         currentUser?.profileImagePath?.let {
             Glide.with(this)
                 .load(it)
-                .placeholder(R.drawable.ic_user_placeholder)
+                .placeholder(R.drawable.ic_logo)
                 .into(binding.ivEnlarged)
         } ?: run {
-            binding.ivEnlarged.setImageResource(R.drawable.ic_user_placeholder)
+            binding.ivEnlarged.setImageResource(R.drawable.ic_logo)
         }
     }
 
@@ -111,11 +111,11 @@ class ProfileFragment : Fragment() {
             if (!user?.profileImagePath.isNullOrEmpty()) {
                 Glide.with(this@ProfileFragment)
                     .load(user?.profileImagePath)
-                    .placeholder(R.drawable.ic_user_placeholder)
+                    .placeholder(R.drawable.ic_logo)
                     .circleCrop()
                     .into(binding.ivAvatar)
             } else {
-                binding.ivAvatar.setImageResource(R.drawable.ic_user_placeholder)
+                binding.ivAvatar.setImageResource(R.drawable.ic_logo)
             }
         }
 
