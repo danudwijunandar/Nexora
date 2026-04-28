@@ -65,12 +65,18 @@ class AddFinanceFragment : Fragment() {
                 binding.tilNote.isEnabled = false
                 binding.tilNote.alpha = 0.5f
                 binding.tilNote.helperText = "Catatan tidak dapat diubah"
+
+                binding.tilDate.isEnabled = false
+                binding.tilDate.alpha = 0.5f
+                binding.tilDate.helperText = "Tanggal tidak dapat diubah"
             }
         }
 
         binding.btnBack.setOnClickListener { findNavController().navigateUp() }
         binding.tilDate.editText?.setOnClickListener { 
-            showDatePicker() 
+            if (financeId == -1) {
+                showDatePicker()
+            }
         }
         binding.btnSave.setOnClickListener { saveFinance() }
         binding.btnDelete.setOnClickListener { showDeleteConfirmation() }
@@ -167,16 +173,11 @@ class AddFinanceFragment : Fragment() {
         val type = binding.root.findViewById<Chip>(selectedChipId).text.toString().lowercase()
         val amountClean = amountRaw.replace(Regex("[^0-9]"), "")
 
-        val finalDate = if (originalDate?.contains("T") == true && originalDate?.startsWith(dateText) == true) {
-            originalDate!!
-        } else {
-            "$dateText 00:00:00"
-        }
-        
         if (financeId == -1) {
             viewModel.addFinance(token, type, category, amountClean, dateText, note)
         } else {
-            viewModel.updateFinance(token, financeId, type, category, amountClean, finalDate)
+            // Sesuai permintaan, hapus pengiriman date pada method PATCH (update)
+            viewModel.updateFinance(token, financeId, type, category, amountClean)
         }
     }
 

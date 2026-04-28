@@ -92,7 +92,7 @@ interface ApiService {
         @Field("type") type: String,
         @Field("category") category: String,
         @Field("amount") amount: String,
-        @Field("date") date: String
+        @Field("date") date: String? = null
     ): Response<Void>
 
     @DELETE("finance/delete/{id}")
