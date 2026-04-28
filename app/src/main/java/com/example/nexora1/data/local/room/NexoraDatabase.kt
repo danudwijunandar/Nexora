@@ -1,9 +1,7 @@
 package com.example.nexora1.data.local.room
 
 import android.content.Context
-import androidx.room.Database
-import androidx.room.Room
-import androidx.room.RoomDatabase
+import androidx.room.*
 
 @Database(entities = [ActivityEntity::class, UserEntity::class, FinanceEntity::class, NotificationEntity::class], version = 8, exportSchema = false)
 abstract class NexoraDatabase : RoomDatabase() {

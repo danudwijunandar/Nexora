@@ -8,7 +8,6 @@ import com.example.nexora1.data.local.prefs.SessionManager
 import com.example.nexora1.databinding.ActivityMainBinding
 import com.example.nexora1.ui.AddSelectionBottomSheet
 import com.example.nexora1.ui.auth.AuthActivity
-import com.example.nexora1.utils.NotificationHelper
 import androidx.work.*
 import com.example.nexora1.utils.DailyActivityWorker
 import java.util.*

@@ -73,9 +73,7 @@ class RegisterFragment : Fragment() {
     private fun setupTermsAndConditions() {
         val fullText = getString(R.string.check_terms_condition)
         val spannableString = SpannableString(fullText)
-        
-        // "Syarat Ketentuan Nexora" usually starts at index 23 in "Saya setuju dengan Syarat Ketentuan Nexora"
-        // But let's find it dynamically to be safe
+
         val target = "Syarat Ketentuan Nexora"
         val startIndex = fullText.indexOf(target)
         val endIndex = startIndex + target.length
@@ -89,7 +87,7 @@ class RegisterFragment : Fragment() {
                 override fun updateDrawState(ds: TextPaint) {
                     super.updateDrawState(ds)
                     ds.isUnderlineText = true
-                    ds.color = Color.BLUE // Or use your primary color
+                    ds.color = Color.BLUE
                 }
             }
             spannableString.setSpan(clickableSpan, startIndex, endIndex, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)

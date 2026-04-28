@@ -2,6 +2,7 @@ package com.example.nexora1.data.local.prefs
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.core.content.edit
 
 class SessionManager(context: Context) {
     private val prefs: SharedPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
@@ -26,7 +27,7 @@ class SessionManager(context: Context) {
     }
 
     fun setOnboardingDone(isDone: Boolean) {
-        prefs.edit().putBoolean(KEY_IS_ONBOARDING_DONE, isDone).apply()
+        prefs.edit { putBoolean(KEY_IS_ONBOARDING_DONE, isDone) }
     }
 
     fun isOnboardingDone(): Boolean = prefs.getBoolean(KEY_IS_ONBOARDING_DONE, false)
@@ -40,7 +41,7 @@ class SessionManager(context: Context) {
     fun getEmail(): String? = prefs.getString(KEY_EMAIL, "user@nexora.com")
 
     fun logout() {
-        prefs.edit().clear().apply()
+        prefs.edit { clear() }
         setOnboardingDone(true) 
     }
 }

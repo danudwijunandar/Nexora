@@ -92,7 +92,6 @@ object NotificationHelper {
         }
     }
 
-    // Tetap pertahankan scheduleActivityReminder jika masih dibutuhkan di bagian lain
     fun scheduleActivityReminder(context: Context, activityId: Int, title: String, delayMillis: Long) {
         if (delayMillis <= 0) return
 

@@ -4,9 +4,7 @@ import android.content.Context
 import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.example.nexora1.data.local.room.ActivityEntity
 import com.example.nexora1.data.local.room.NexoraDatabase
-import java.text.SimpleDateFormat
 import java.util.*
 
 class DailyActivityWorker(ctx: Context, params: WorkerParameters) : CoroutineWorker(ctx, params) {

@@ -176,7 +176,6 @@ class AddFinanceFragment : Fragment() {
         if (financeId == -1) {
             viewModel.addFinance(token, type, category, amountClean, dateText, note)
         } else {
-            // Sesuai permintaan, hapus pengiriman date pada method PATCH (update)
             viewModel.updateFinance(token, financeId, type, category, amountClean)
         }
     }

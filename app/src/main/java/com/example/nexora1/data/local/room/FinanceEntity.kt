@@ -1,7 +1,6 @@
 package com.example.nexora1.data.local.room
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+import androidx.room.*
 
 @Entity(tableName = "finance")
 data class FinanceEntity(
