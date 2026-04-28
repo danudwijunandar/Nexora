@@ -1,5 +1,6 @@
 package com.example.nexora1.utils
 
+import android.app.AlarmManager
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -63,6 +64,35 @@ object NotificationHelper {
         notificationManager.notify(id, notification)
     }
 
+    fun setOneTimeAlarm(context: Context, delayMillis: Long) {
+        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(context, NotificationReceiver::class.java)
+        
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            100,
+            intent,
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT else PendingIntent.FLAG_UPDATE_CURRENT
+        )
+
+        val triggerTime = System.currentTimeMillis() + delayMillis
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            alarmManager.setExactAndAllowWhileIdle(
+                AlarmManager.RTC_WAKEUP,
+                triggerTime,
+                pendingIntent
+            )
+        } else {
+            alarmManager.setExact(
+                AlarmManager.RTC_WAKEUP,
+                triggerTime,
+                pendingIntent
+            )
+        }
+    }
+
+    // Tetap pertahankan scheduleActivityReminder jika masih dibutuhkan di bagian lain
     fun scheduleActivityReminder(context: Context, activityId: Int, title: String, delayMillis: Long) {
         if (delayMillis <= 0) return
 
