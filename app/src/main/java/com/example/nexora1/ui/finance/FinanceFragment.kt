@@ -5,12 +5,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.nexora1.R
+import com.example.nexora1.data.Result
 import com.example.nexora1.data.local.prefs.SessionManager
 import com.example.nexora1.data.remote.response.FinanceData
 import com.example.nexora1.databinding.FragmentFinanceBinding
@@ -44,10 +46,22 @@ class FinanceFragment : Fragment() {
         sessionManager = SessionManager(requireContext())
 
         setupRecyclerView()
+        setupSwipeRefresh()
         setupSearch()
         setupFilters()
         observeViewModel()
         
+        syncData()
+    }
+
+    private fun setupSwipeRefresh() {
+        binding.swipeRefresh.setOnRefreshListener {
+            syncData()
+        }
+        binding.swipeRefresh.setColorSchemeResources(R.color.colorPrimary)
+    }
+
+    private fun syncData() {
         val token = sessionManager.getToken() ?: ""
         if (token.isNotEmpty()) {
             viewModel.syncFinance(token)
@@ -108,6 +122,17 @@ class FinanceFragment : Fragment() {
             fullList = dataList
             updateSummary(fullList)
             applyFilters()
+        }
+
+        viewModel.syncResult.observe(viewLifecycleOwner) { result ->
+            when (result) {
+                is Result.Loading -> binding.swipeRefresh.isRefreshing = true
+                is Result.Success -> binding.swipeRefresh.isRefreshing = false
+                is Result.Error -> {
+                    binding.swipeRefresh.isRefreshing = false
+                    Toast.makeText(requireContext(), result.error, Toast.LENGTH_SHORT).show()
+                }
+            }
         }
     }
 

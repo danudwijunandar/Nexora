@@ -2,6 +2,8 @@ package com.example.nexora1.ui.finance
 
 import android.app.DatePickerDialog
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,6 +18,7 @@ import com.example.nexora1.data.local.prefs.SessionManager
 import com.example.nexora1.databinding.FragmentAddFinanceBinding
 import com.example.nexora1.ui.ViewModelFactory
 import com.google.android.material.chip.Chip
+import java.text.NumberFormat
 import java.util.*
 
 class AddFinanceFragment : Fragment() {
@@ -40,6 +43,8 @@ class AddFinanceFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         sessionManager = SessionManager(requireContext())
+
+        setupAmountFormatting()
 
         arguments?.let {
             financeId = it.getInt("financeId", -1)
@@ -82,6 +87,41 @@ class AddFinanceFragment : Fragment() {
         binding.btnDelete.setOnClickListener { showDeleteConfirmation() }
 
         observeViewModel()
+    }
+
+    private fun setupAmountFormatting() {
+        binding.tilAmount.editText?.addTextChangedListener(object : TextWatcher {
+            private var current = ""
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                if (s.toString() != current) {
+                    binding.tilAmount.editText?.removeTextChangedListener(this)
+
+                    val cleanString = s.toString().replace(Regex("[^0-9]"), "")
+                    if (cleanString.isNotEmpty()) {
+                        try {
+                            val parsed = cleanString.toDouble()
+                            val formatter = NumberFormat.getInstance(Locale("id", "ID"))
+                            val formatted = formatter.format(parsed)
+
+                            current = formatted
+                            binding.tilAmount.editText?.setText(formatted)
+                            binding.tilAmount.editText?.setSelection(formatted.length)
+                        } catch (e: Exception) {
+                            // Ignore
+                        }
+                    } else {
+                        current = ""
+                        binding.tilAmount.editText?.setText("")
+                    }
+
+                    binding.tilAmount.editText?.addTextChangedListener(this)
+                }
+            }
+
+            override fun afterTextChanged(s: Editable?) {}
+        })
     }
 
     private fun showDeleteConfirmation() {

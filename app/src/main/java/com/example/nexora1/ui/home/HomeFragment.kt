@@ -69,6 +69,8 @@ class HomeFragment : Fragment() {
         sessionManager = SessionManager(requireContext())
         
         setupRecyclerView()
+        setupSwipeRefresh()
+        
         binding.tvGreeting.text = "Halo, ${sessionManager.getUsername()}!"
         
         binding.ivNotification.setOnClickListener {
@@ -94,6 +96,17 @@ class HomeFragment : Fragment() {
         setupTimeFilterListeners()
         observeViewModel()
         
+        syncData()
+    }
+
+    private fun setupSwipeRefresh() {
+        binding.swipeRefresh.setOnRefreshListener {
+            syncData()
+        }
+        binding.swipeRefresh.setColorSchemeResources(R.color.colorPrimary)
+    }
+
+    private fun syncData() {
         val token = sessionManager.getToken() ?: ""
         if (token.isNotEmpty()) {
             activityViewModel.syncActivities(token)
@@ -206,10 +219,10 @@ class HomeFragment : Fragment() {
                     updateStatus(activity, true)
                 }
                 .setNegativeButton("Tidak") { _, _ ->
-                    activityViewModel.syncActivities(sessionManager.getToken() ?: "")
+                    syncData()
                 }
                 .setOnCancelListener {
-                    activityViewModel.syncActivities(sessionManager.getToken() ?: "")
+                    syncData()
                 }
                 .show()
         } else {
@@ -227,6 +240,17 @@ class HomeFragment : Fragment() {
         activityViewModel.getActivities().observe(viewLifecycleOwner) { activities ->
             fullList = activities
             applyFilters()
+        }
+
+        activityViewModel.syncResult.observe(viewLifecycleOwner) { result ->
+            when (result) {
+                is Result.Loading -> binding.swipeRefresh.isRefreshing = true
+                is Result.Success -> binding.swipeRefresh.isRefreshing = false
+                is Result.Error -> {
+                    binding.swipeRefresh.isRefreshing = false
+                    Toast.makeText(requireContext(), result.error, Toast.LENGTH_SHORT).show()
+                }
+            }
         }
 
         activityViewModel.updateStatusResult.observe(viewLifecycleOwner) { event ->

@@ -15,13 +15,22 @@ class FinanceViewModel(private val repository: NexoraRepository) : ViewModel() {
     private val _financeResult = MutableLiveData<Result<Boolean>>()
     val financeResult: LiveData<Result<Boolean>> = _financeResult
 
+    private val _syncResult = MutableLiveData<Result<Unit>>()
+    val syncResult: LiveData<Result<Unit>> = _syncResult
+
     fun getFinance(): LiveData<List<FinanceEntity>> {
         return repository.getLocalFinance().asLiveData()
     }
 
     fun syncFinance(token: String) {
+        _syncResult.value = Result.Loading
         viewModelScope.launch {
-            repository.syncFinance(token)
+            try {
+                repository.syncFinance(token)
+                _syncResult.value = Result.Success(Unit)
+            } catch (e: Exception) {
+                _syncResult.value = Result.Error(e.message ?: "Terjadi kesalahan")
+            }
         }
     }
 
