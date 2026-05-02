@@ -35,6 +35,9 @@
             app:launchSingleTop="true"
             app:popUpTo="@id/homeFragment"
             app:popUpToInclusive="false" />
+        <action
+            android:id="@+id/action_financeFragment_to_financeRecapFragment"
+            app:destination="@id/financeRecapFragment" />
     </fragment>
 
     <fragment
@@ -127,5 +130,11 @@
             app:popUpTo="@id/homeFragment"
             app:popUpToInclusive="false" />
     </fragment>
+
+    <fragment
+        android:id="@+id/financeRecapFragment"
+        android:name="com.example.nexora1.ui.finance.FinanceRecapFragment"
+        android:label="Finance Recap"
+        tools:layout="@layout/fragment_finance_recap" />
 
 </navigation>

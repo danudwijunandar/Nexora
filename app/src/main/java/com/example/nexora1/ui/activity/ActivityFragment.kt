@@ -1,5 +1,6 @@
 package com.example.nexora1.ui.activity
 
+import android.app.DatePickerDialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -32,7 +33,9 @@ class ActivityFragment : Fragment() {
     }
 
     private var fullList: List<ActivityData> = emptyList()
-    private var selectedDate: String = ""
+    private val calendar = Calendar.getInstance()
+    private val sdfFilter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+    private val sdfDisplay = SimpleDateFormat("EEE, dd MMM yyyy", Locale("in", "ID"))
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -46,11 +49,9 @@ class ActivityFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         sessionManager = SessionManager(requireContext())
 
-        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        selectedDate = sdf.format(Date())
-
         setupRecyclerView()
-        setupCalendar()
+        setupDateNavigation()
+        updateDateDisplay()
         observeViewModel()
         
         val token = sessionManager.getToken() ?: ""
@@ -108,20 +109,48 @@ class ActivityFragment : Fragment() {
         viewModel.updateActivityStatus(token, activity.id, activity.title, status)
     }
 
-    private fun setupCalendar() {
-        binding.calendarView.setOnDateChangeListener { _, year, month, dayOfMonth ->
-            val cal = Calendar.getInstance()
-            cal.set(year, month, dayOfMonth)
-            val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-            selectedDate = sdf.format(cal.time)
-            applyFilters()
+    private fun setupDateNavigation() {
+        binding.btnPrevDay.setOnClickListener {
+            calendar.add(Calendar.DAY_OF_YEAR, -1)
+            updateDateDisplay()
+        }
+
+        binding.btnNextDay.setOnClickListener {
+            calendar.add(Calendar.DAY_OF_YEAR, 1)
+            updateDateDisplay()
+        }
+
+        binding.tvSelectedDate.setOnClickListener {
+            showDatePicker()
         }
     }
 
+    private fun showDatePicker() {
+        val datePicker = DatePickerDialog(
+            requireContext(),
+            { _, year, month, dayOfMonth ->
+                calendar.set(Calendar.YEAR, year)
+                calendar.set(Calendar.MONTH, month)
+                calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+                updateDateDisplay()
+            },
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH),
+            calendar.get(Calendar.DAY_OF_MONTH)
+        )
+        datePicker.show()
+    }
+
+    private fun updateDateDisplay() {
+        binding.tvSelectedDate.text = sdfDisplay.format(calendar.time)
+        applyFilters()
+    }
+
     private fun applyFilters() {
+        val selectedDateStr = sdfFilter.format(calendar.time)
         val filteredList = fullList.filter {
             val dateToCheck = it.date ?: it.createdAt
-            dateToCheck.startsWith(selectedDate)
+            dateToCheck.startsWith(selectedDateStr)
         }.sortedWith(compareBy<ActivityData> {
             if (it.status == "selesai" || it.status == "3") 1 else 0
         }.thenByDescending {

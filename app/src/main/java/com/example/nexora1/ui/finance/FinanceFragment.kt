@@ -49,9 +49,16 @@ class FinanceFragment : Fragment() {
         setupSwipeRefresh()
         setupSearch()
         setupFilters()
+        setupActions()
         observeViewModel()
         
         syncData()
+    }
+
+    private fun setupActions() {
+        binding.btnRecap.setOnClickListener {
+            findNavController().navigate(R.id.action_financeFragment_to_financeRecapFragment)
+        }
     }
 
     private fun setupSwipeRefresh() {
