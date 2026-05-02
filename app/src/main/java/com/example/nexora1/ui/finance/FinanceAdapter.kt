@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.nexora1.R
 import com.example.nexora1.data.remote.response.FinanceData
 import com.example.nexora1.databinding.ItemFinanceBinding
+import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.TimeZone
@@ -30,7 +31,6 @@ class FinanceAdapter(private val onItemClick: (FinanceData) -> Unit) : ListAdapt
                 binding.tvType.text = "Pengeluaran"
             }
 
-            // MENGGUNAKAN finance.date (pilihan user) BUKAN finance.createdAt
             binding.tvDate.text = formatDateTime(finance.date)
 
             val isPemasukan = checkIfIncome(finance)
@@ -78,7 +78,13 @@ class FinanceAdapter(private val onItemClick: (FinanceData) -> Unit) : ListAdapt
 
         private fun setAmountStyle(amount: String, isIncome: Boolean, color: Int) {
             val prefix = if (isIncome) "+" else "-"
-            binding.tvAmount.text = itemView.context.getString(R.string.finance_amount_format, prefix, amount)
+            
+            // Format angka dengan titik sebagai pemisah ribuan
+            val cleanAmount = amount.replace(Regex("[^0-9]"), "").toLongOrNull() ?: 0L
+            val formatter = NumberFormat.getInstance(Locale("id", "ID"))
+            val formattedAmount = formatter.format(cleanAmount)
+            
+            binding.tvAmount.text = itemView.context.getString(R.string.finance_amount_format, prefix, formattedAmount)
             binding.tvAmount.setTextColor(color)
         }
 
