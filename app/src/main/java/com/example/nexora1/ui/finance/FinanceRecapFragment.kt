@@ -66,7 +66,7 @@ class FinanceRecapFragment : Fragment() {
                     createdAt = entity.createdAt,
                     updatedAt = entity.updatedAt
                 )
-            }.sortedByDescending { it.createdAt }
+            }.sortedByDescending { it.date } // Urutkan berdasarkan tanggal pilihan user
 
             if (dataList.isEmpty()) {
                 binding.tvEmpty.visibility = View.VISIBLE
@@ -87,8 +87,8 @@ class FinanceRecapFragment : Fragment() {
 
         list.forEach { item ->
             try {
-                // Handle different date formats if necessary, assuming createdAt is usable
-                val dateStr = item.createdAt.split(" ")[0].split("T")[0]
+                // Gunakan item.date BUKAN item.createdAt
+                val dateStr = item.date.split(" ")[0].split("T")[0]
                 val date = sdfSource.parse(dateStr)
                 val monthYear = if (date != null) sdfMonthYear.format(date) else "Lainnya"
                 
@@ -104,13 +104,10 @@ class FinanceRecapFragment : Fragment() {
         }
 
         val resultList = mutableListOf<FinanceRecapItem>()
-        
-        // Sort keys to show latest months first if needed, 
-        // but since list is already sorted by createdAt descending, 
-        // we can iterate through unique monthYear in order of appearance.
         val processedMonthYears = mutableSetOf<String>()
+        
         list.forEach { item ->
-            val dateStr = item.createdAt.split(" ")[0].split("T")[0]
+            val dateStr = item.date.split(" ")[0].split("T")[0]
             val date = try { sdfSource.parse(dateStr) } catch(e: Exception) { null }
             val monthYear = if (date != null) sdfMonthYear.format(date) else "Lainnya"
             

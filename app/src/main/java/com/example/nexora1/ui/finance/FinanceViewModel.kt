@@ -50,11 +50,11 @@ class FinanceViewModel(private val repository: NexoraRepository) : ViewModel() {
         }
     }
 
-    fun updateFinance(token: String, id: Int, type: String, category: String, amount: String) {
+    fun updateFinance(token: String, id: Int, type: String, category: String, amount: String, date: String? = null) {
         _financeResult.value = Result.Loading
         viewModelScope.launch {
             try {
-                val success = repository.updateFinance(token, id, type, category, amount)
+                val success = repository.updateFinance(token, id, type, category, amount, date)
                 if (success) {
                     _financeResult.value = Result.Success(true)
                 } else {

@@ -30,7 +30,8 @@ class FinanceAdapter(private val onItemClick: (FinanceData) -> Unit) : ListAdapt
                 binding.tvType.text = "Pengeluaran"
             }
 
-            binding.tvDate.text = formatDateTime(finance.createdAt)
+            // MENGGUNAKAN finance.date (pilihan user) BUKAN finance.createdAt
+            binding.tvDate.text = formatDateTime(finance.date)
 
             val isPemasukan = checkIfIncome(finance)
             
@@ -48,7 +49,7 @@ class FinanceAdapter(private val onItemClick: (FinanceData) -> Unit) : ListAdapt
         }
 
         private fun formatDateTime(dateTime: String): String {
-            val formats = arrayOf("yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", "yyyy-MM-dd'T'HH:mm:ss")
+            val formats = arrayOf("yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd")
             var parsedDate: java.util.Date? = null
             for (format in formats) {
                 try {

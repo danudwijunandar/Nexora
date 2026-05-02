@@ -19,6 +19,7 @@ import com.example.nexora1.databinding.FragmentAddFinanceBinding
 import com.example.nexora1.ui.ViewModelFactory
 import com.google.android.material.chip.Chip
 import java.text.NumberFormat
+import java.text.SimpleDateFormat
 import java.util.*
 
 class AddFinanceFragment : Fragment() {
@@ -26,7 +27,9 @@ class AddFinanceFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var sessionManager: SessionManager
     private var financeId: Int = -1
-    private var originalDate: String? = null
+    private val calendar = Calendar.getInstance()
+    private val sdfDisplay = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+    private val sdfFull = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
 
     private val viewModel: FinanceViewModel by viewModels {
         ViewModelFactory.getInstance(requireContext())
@@ -46,6 +49,9 @@ class AddFinanceFragment : Fragment() {
 
         setupAmountFormatting()
 
+        // Set default date to today for new entry
+        binding.tilDate.editText?.setText(sdfDisplay.format(calendar.time))
+
         arguments?.let {
             financeId = it.getInt("financeId", -1)
             if (financeId != -1) {
@@ -55,8 +61,22 @@ class AddFinanceFragment : Fragment() {
                 binding.tilCategory.editText?.setText(it.getString("category"))
                 binding.tilAmount.editText?.setText(it.getString("amount"))
                 
-                originalDate = it.getString("date")
-                binding.tilDate.editText?.setText(originalDate?.substringBefore("T"))
+                val dateStr = it.getString("date")
+                if (dateStr != null) {
+                    try {
+                        val parsedDate = if (dateStr.contains("T")) {
+                            SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault()).parse(dateStr)
+                        } else {
+                            sdfFull.parse(dateStr)
+                        }
+                        parsedDate?.let { date ->
+                            calendar.time = date
+                            binding.tilDate.editText?.setText(sdfDisplay.format(calendar.time))
+                        }
+                    } catch (e: Exception) {
+                        binding.tilDate.editText?.setText(dateStr.substringBefore("T"))
+                    }
+                }
                 
                 binding.tilNote.editText?.setText(it.getString("note"))
                 
@@ -71,6 +91,7 @@ class AddFinanceFragment : Fragment() {
                 binding.tilNote.alpha = 0.5f
                 binding.tilNote.helperText = "Catatan tidak dapat diubah"
 
+                // KEMBALIKAN: Tanggal tidak dapat diubah saat edit
                 binding.tilDate.isEnabled = false
                 binding.tilDate.alpha = 0.5f
                 binding.tilDate.helperText = "Tanggal tidak dapat diubah"
@@ -79,8 +100,8 @@ class AddFinanceFragment : Fragment() {
 
         binding.btnBack.setOnClickListener { findNavController().navigateUp() }
         binding.tilDate.editText?.setOnClickListener { 
-            if (financeId == -1) {
-                showDatePicker()
+            if (financeId == -1) { // Hanya bisa klik jika input baru
+                showDatePicker() 
             }
         }
         binding.btnSave.setOnClickListener { saveFinance() }
@@ -160,11 +181,11 @@ class AddFinanceFragment : Fragment() {
     }
 
     private fun showDatePicker() {
-        val calendar = Calendar.getInstance()
         DatePickerDialog(requireContext(), { _, year, month, dayOfMonth ->
-            val date = String.format("%04d-%02d-%02d", year, month + 1, dayOfMonth)
-            binding.tilDate.editText?.setText(date)
-            originalDate = date 
+            calendar.set(Calendar.YEAR, year)
+            calendar.set(Calendar.MONTH, month)
+            calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+            binding.tilDate.editText?.setText(sdfDisplay.format(calendar.time))
         }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show()
     }
 
@@ -172,8 +193,6 @@ class AddFinanceFragment : Fragment() {
         val selectedChipId = binding.cgType.checkedChipId
         val category = binding.tilCategory.editText?.text.toString().trim()
         val amountRaw = binding.tilAmount.editText?.text.toString().trim()
-        val dateText = binding.tilDate.editText?.text.toString().trim()
-        val note = binding.tilNote.editText?.text.toString().trim()
         val token = sessionManager.getToken() ?: ""
 
         binding.tilCategory.error = null
@@ -198,11 +217,7 @@ class AddFinanceFragment : Fragment() {
             isValid = false
         }
         
-        if (dateText.isEmpty()) {
-            binding.tilDate.error = "Tanggal harus diisi"
-            isValid = false
-        }
-
+        val note = binding.tilNote.editText?.text.toString().trim()
         if (financeId == -1 && note.isEmpty()) {
             binding.tilNote.error = "Catatan harus diisi"
             isValid = false
@@ -214,8 +229,16 @@ class AddFinanceFragment : Fragment() {
         val amountClean = amountRaw.replace(Regex("[^0-9]"), "")
 
         if (financeId == -1) {
-            viewModel.addFinance(token, type, category, amountClean, dateText, note)
+            // Gabungkan tanggal yang dipilih dengan WAKTU SAAT INI (Jam, Menit, Detik)
+            val currentTime = Calendar.getInstance()
+            calendar.set(Calendar.HOUR_OF_DAY, currentTime.get(Calendar.HOUR_OF_DAY))
+            calendar.set(Calendar.MINUTE, currentTime.get(Calendar.MINUTE))
+            calendar.set(Calendar.SECOND, currentTime.get(Calendar.SECOND))
+            
+            val finalDate = sdfFull.format(calendar.time)
+            viewModel.addFinance(token, type, category, amountClean, finalDate, note)
         } else {
+            // Saat update, tanggal tidak diubah (sesuai permintaan user)
             viewModel.updateFinance(token, financeId, type, category, amountClean)
         }
     }

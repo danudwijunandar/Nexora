@@ -59,7 +59,9 @@ class FinanceRecapAdapter : ListAdapter<FinanceRecapItem, RecyclerView.ViewHolde
             val context = itemView.context
             binding.tvCategory.text = finance.category
             binding.tvNote.text = finance.note
-            binding.tvTime.text = formatDateTime(finance.createdAt)
+            
+            // PERBAIKAN: Menggunakan finance.date (pilihan user) bukan createdAt
+            binding.tvTime.text = formatDateTime(finance.date)
 
             val isPemasukan = finance.type.lowercase().contains("pemasukan") || 
                              finance.type.lowercase().contains("pemasukkan") ||
@@ -88,7 +90,7 @@ class FinanceRecapAdapter : ListAdapter<FinanceRecapItem, RecyclerView.ViewHolde
         }
 
         private fun formatDateTime(dateTime: String): String {
-            val formats = arrayOf("yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", "yyyy-MM-dd'T'HH:mm:ss")
+            val formats = arrayOf("yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd")
             var parsedDate: java.util.Date? = null
             for (format in formats) {
                 try {

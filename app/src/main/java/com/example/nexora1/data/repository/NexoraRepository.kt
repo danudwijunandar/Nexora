@@ -220,9 +220,9 @@ class NexoraRepository(
         }
     }
 
-    suspend fun updateFinance(token: String, id: Int, type: String, category: String, amount: String): Boolean {
+    suspend fun updateFinance(token: String, id: Int, type: String, category: String, amount: String, date: String? = null): Boolean {
         return try {
-            val response = apiService.updateFinance("Bearer $token", id, type, category, amount, null)
+            val response = apiService.updateFinance("Bearer $token", id, type, category, amount, date)
             if (response.isSuccessful) {
                 syncFinance(token)
                 true
