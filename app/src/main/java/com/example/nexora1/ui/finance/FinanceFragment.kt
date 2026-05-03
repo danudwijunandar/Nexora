@@ -1,10 +1,12 @@
 package com.example.nexora1.ui.finance
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.NumberPicker
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
@@ -18,7 +20,9 @@ import com.example.nexora1.data.remote.response.FinanceData
 import com.example.nexora1.databinding.FragmentFinanceBinding
 import com.example.nexora1.ui.ViewModelFactory
 import com.example.nexora1.ui.auth.AuthActivity
+import java.text.DateFormatSymbols
 import java.text.NumberFormat
+import java.text.SimpleDateFormat
 import java.util.*
 
 class FinanceFragment : Fragment() {
@@ -32,6 +36,7 @@ class FinanceFragment : Fragment() {
     }
 
     private var fullList: List<FinanceData> = emptyList()
+    private var selectedCalendar = Calendar.getInstance()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -52,6 +57,7 @@ class FinanceFragment : Fragment() {
         setupActions()
         observeViewModel()
         
+        updatePeriodDisplay()
         syncData()
     }
 
@@ -59,6 +65,44 @@ class FinanceFragment : Fragment() {
         binding.btnRecap.setOnClickListener {
             findNavController().navigate(R.id.action_financeFragment_to_financeRecapFragment)
         }
+        
+        binding.llHeaderBalance.setOnClickListener {
+            showMonthYearPicker()
+        }
+    }
+
+    private fun showMonthYearPicker() {
+        val view = layoutInflater.inflate(R.layout.dialog_month_year_picker, null)
+        val monthPicker = view.findViewById<NumberPicker>(R.id.monthPicker)
+        val yearPicker = view.findViewById<NumberPicker>(R.id.yearPicker)
+
+        val months = DateFormatSymbols().months
+        monthPicker.minValue = 0
+        monthPicker.maxValue = 11
+        monthPicker.displayedValues = months
+        monthPicker.value = selectedCalendar.get(Calendar.MONTH)
+
+        val currentYear = Calendar.getInstance().get(Calendar.YEAR)
+        yearPicker.minValue = currentYear - 5
+        yearPicker.maxValue = currentYear + 5
+        yearPicker.value = selectedCalendar.get(Calendar.YEAR)
+
+        AlertDialog.Builder(requireContext())
+            .setTitle("Pilih Periode")
+            .setView(view)
+            .setPositiveButton("Pilih") { _, _ ->
+                selectedCalendar.set(Calendar.MONTH, monthPicker.value)
+                selectedCalendar.set(Calendar.YEAR, yearPicker.value)
+                updatePeriodDisplay()
+                applyFilters()
+            }
+            .setNegativeButton("Batal", null)
+            .show()
+    }
+
+    private fun updatePeriodDisplay() {
+        val sdf = SimpleDateFormat("MMMM yyyy", Locale("id", "ID"))
+        binding.tvBalancePeriod.text = sdf.format(selectedCalendar.time)
     }
 
     private fun setupSwipeRefresh() {
@@ -127,7 +171,6 @@ class FinanceFragment : Fragment() {
                 )
             }
             fullList = dataList
-            updateSummary(fullList)
             applyFilters()
         }
 
@@ -147,7 +190,29 @@ class FinanceFragment : Fragment() {
         val query = binding.searchFinance.query.toString().lowercase()
         val checkedChipId = binding.cgFilter.checkedChipId
         
-        var filteredList = fullList
+        val selectedMonth = selectedCalendar.get(Calendar.MONTH)
+        val selectedYear = selectedCalendar.get(Calendar.YEAR)
+
+        var filteredList = fullList.filter { item ->
+            try {
+                val dateStr = item.date
+                val sdf = if (dateStr.contains("T")) {
+                    SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
+                } else {
+                    SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+                }
+                val date = sdf.parse(dateStr)
+                if (date != null) {
+                    val cal = Calendar.getInstance()
+                    cal.time = date
+                    cal.get(Calendar.MONTH) == selectedMonth && cal.get(Calendar.YEAR) == selectedYear
+                } else false
+            } catch (e: Exception) {
+                false
+            }
+        }
+
+        updateSummary(filteredList)
 
         if (checkedChipId != View.NO_ID) {
             when (checkedChipId) {
